@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Collection;
 public class ChessGame {
     private TeamColor teamTurn = TeamColor.WHITE;
     private ChessBoard currentBoard = new ChessBoard();
-    private Collection<ChessMove> legalMoves;
+    private Collection<ChessMove> legalMoves = new ArrayList<>();
     public ChessGame() {
 
     }
@@ -30,6 +31,7 @@ public class ChessGame {
      * The function will change teamTurn from whatever color team is to the other color
      */
     public void setTeamTurn(TeamColor team) {
+        // teamTurn = team;
         if(team == TeamColor.WHITE){    
             teamTurn = TeamColor.BLACK;
         }else{
@@ -53,45 +55,78 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece curPiece = currentBoard.getPiece(startPosition);
-        if(curPiece == null){
-            return null;
-        }
+        // System.out.println("In validMoves");
+
+        Collection<ChessMove> newLegalMoves = new ArrayList<>();
+        ChessPiece curPiece = new ChessPiece(null, null);
+        curPiece = currentBoard.getPiece(startPosition);
+        System.out.println("curPiece: " + curPiece);
         legalMoves = curPiece.pieceMoves(currentBoard, startPosition);
-        ChessBoard tempBoard = currentBoard;
+        
         
         
         for(ChessMove curMove : legalMoves){
-            if(deleteMove(tempBoard, curMove, curPiece)){
-                legalMoves.remove(curMove);
+            ChessBoard tempBoard = new ChessBoard(currentBoard);
+            System.out.println("Tempboard pieces:");
+            for(int i = 0; i < 8; i++){
+                for(int j = 0; j < 8; j++){
+                    if(tempBoard.getBoard()[i][j] != null){
+                        System.out.println("Type = " + tempBoard.getBoard()[i][j].getPieceType() + " Team = " + tempBoard.getBoard()[i][j].getTeamColor());
+                    }
+                    
+                }
             }
-            
-            //If deleteMove returns true, remove that move from the collection
+            // System.out.println("Looping through legal moves");
+            if(!deleteMove(tempBoard, curMove, curPiece) == true){
+                newLegalMoves.add(curMove);
+                // System.out.println("Deleted move");
+            }
         }
-        return legalMoves;
+        // System.out.println("About to leave validMoves");
+        legalMoves = newLegalMoves;
+        for(ChessMove debug : legalMoves){
+            System.out.println("End position: (" + debug.getEndPosition().getRow() + ", " + debug.getEndPosition().getColumn() + ")");
+        }
+        System.out.println(legalMoves.toString());
+        return newLegalMoves;
     }
+
     public boolean deleteMove(ChessBoard tempBoard, ChessMove move, ChessPiece curPiece){
+        // ChessBoard tempBoard = new ChessBoard(board);
+        System.out.println("In helper funciton");
         boolean shouldDelete = false;
-        Collection<ChessMove> tempPieceMoves = null;
-        tempBoard.getBoard()[move.getStartPosition().getRow()][move.getStartPosition().getColumn()] = null;
-        tempBoard.getBoard()[move.getEndPosition().getRow()][move.getEndPosition().getColumn()] = curPiece;
-        //Loops to check the moves of each non-pawn enemy piece
+        ChessPiece tempPiece = new ChessPiece(null, null);
+        Collection<ChessMove> tempPieceMoves = new ArrayList<>();
+        tempBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
+        tempBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = curPiece;
+        //Loops to check the moves of each major enemy piece
         for(int row = 0; row < 8; row++){
             for(int col = 0; col < 8; col++){
                 if(tempBoard.getBoard()[row][col] != null 
-                && tempBoard.getBoard()[row][col].getPieceType() != ChessPiece.PieceType.PAWN 
+                && tempBoard.getBoard()[row][col].getPieceType() != ChessPiece.PieceType.PAWN
                 && tempBoard.getBoard()[row][col].getTeamColor() != curPiece.getTeamColor()){
                     //Gets all the possile enemy moves
-                    tempPieceMoves = tempBoard.getBoard()[row][col].pieceMoves(tempBoard, new ChessPosition(row, col));
-                }
-                for(ChessMove moves : tempPieceMoves){
-                    if(tempBoard.getBoard()[moves.getEndPosition().getRow()][moves.getEndPosition().getColumn()].getPieceType() == ChessPiece.PieceType.KING){
-                        shouldDelete = true;
+                    System.out.println("Creating temp moves collection");
+                    ChessPosition tempPosition = new ChessPosition(row + 1, col + 1);
+                    tempPiece = tempBoard.getBoard()[row][col];
+                    System.out.println("tempPiece: " + tempPiece);
+                    tempPieceMoves = tempPiece.pieceMoves(tempBoard, tempPosition);
+                    for(ChessMove moves : tempPieceMoves){
+                        System.out.println("Looping through temp moves");
+                        if(tempBoard.getBoard()[moves.getEndPosition().getRow() - 1][moves.getEndPosition().getColumn() - 1] == null){
+                            continue;
+                        }
+                        else if(tempBoard.getBoard()[moves.getEndPosition().getRow() - 1][moves.getEndPosition().getColumn() - 1].getPieceType() == ChessPiece.PieceType.KING){
+                            
+                            shouldDelete = true;
+                            System.out.println("Checking if I need to delete move. shouldDelete = " + shouldDelete);
+                        }
                     }
                 }
+                
             }
         }
-        
+        System.out.println("Leaving helper function. shouldDelete = " + shouldDelete);
         return shouldDelete;
     }
 
@@ -193,7 +228,8 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        currentBoard.resetBoard();
+        System.out.println("In setBoard");
+        this.currentBoard = board;
     }
 
     /**

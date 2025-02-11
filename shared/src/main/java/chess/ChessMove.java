@@ -39,8 +39,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        //TODO: Implement this function. This return is a place holder
-        return ChessPiece.PieceType.PAWN;
+        return promotionPiece;
     }
 
     @Override

@@ -14,6 +14,20 @@ public class ChessBoard {
     public ChessBoard() {
         
     }
+    public ChessBoard(ChessBoard copyBoard) {
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                if(copyBoard.board[i][j] != null){
+                    this.board[i][j] = copyBoard.board[i][j];
+                }
+                
+            }
+        }
+    }
+
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
 
     /**
      * Adds a chess piece to the chessboard
@@ -41,6 +55,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
+        System.out.println("Resetting board");
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
                 //Sets major white pieces
@@ -125,6 +140,7 @@ public class ChessBoard {
                 }
             }
         }
+        System.out.println("Finished resetting board");
     }
 
     @Override
@@ -148,4 +164,11 @@ public class ChessBoard {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "ChessBoard [board=" + Arrays.toString(board) + "]";
+    }
+
+    
 }
