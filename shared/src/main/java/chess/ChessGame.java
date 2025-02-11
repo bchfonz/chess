@@ -55,8 +55,6 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        // System.out.println("In validMoves");
-
         Collection<ChessMove> newLegalMoves = new ArrayList<>();
         ChessPiece curPiece = new ChessPiece(null, null);
         curPiece = currentBoard.getPiece(startPosition);
@@ -67,33 +65,15 @@ public class ChessGame {
         
         for(ChessMove curMove : legalMoves){
             ChessBoard tempBoard = new ChessBoard(currentBoard);
-            // System.out.println("Tempboard pieces:");
-            for(int i = 0; i < 8; i++){
-                for(int j = 0; j < 8; j++){
-                    if(tempBoard.getBoard()[i][j] != null){
-                        // System.out.println("Type = " + tempBoard.getBoard()[i][j].getPieceType() + " Team = " + tempBoard.getBoard()[i][j].getTeamColor());
-                    }
-                    
-                }
-            }
-            // System.out.println("Looping through legal moves");
             if(!deleteMove(tempBoard, curMove, curPiece)){
                 newLegalMoves.add(curMove);
-                // System.out.println("Deleted move");
             }
         }
-        // System.out.println("About to leave validMoves");
         legalMoves = newLegalMoves;
-        for(ChessMove debug : legalMoves){
-            System.out.println("End position: (" + debug.getEndPosition().getRow() + ", " + debug.getEndPosition().getColumn() + ")");
-        }
-        // System.out.println(legalMoves.toString());
         return legalMoves;
     }
 
     public boolean deleteMove(ChessBoard tempBoard, ChessMove move, ChessPiece curPiece){
-        // ChessBoard tempBoard = new ChessBoard(board);
-        // System.out.println("In helper funciton");
         boolean shouldDelete = false;
         ChessPiece tempPiece = new ChessPiece(null, null);
         Collection<ChessMove> tempPieceMoves = new ArrayList<>();
@@ -105,13 +85,10 @@ public class ChessGame {
                 if(tempBoard.getBoard()[row][col] != null 
                 && tempBoard.getBoard()[row][col].getTeamColor() != curPiece.getTeamColor()){
                     //Gets all the possile enemy moves
-                    // System.out.println("Creating temp moves collection");
                     ChessPosition tempPosition = new ChessPosition(row + 1, col + 1);
                     tempPiece = tempBoard.getBoard()[row][col];
-                    // System.out.println("tempPiece: " + tempPiece);
                     tempPieceMoves = tempPiece.pieceMoves(tempBoard, tempPosition);
                     for(ChessMove moves : tempPieceMoves){
-                        // System.out.println("Looping through temp moves");
                         if(tempBoard.getBoard()[moves.getEndPosition().getRow() - 1][moves.getEndPosition().getColumn() - 1] == null){
                             continue;
                         }
@@ -125,7 +102,6 @@ public class ChessGame {
                 
             }
         }
-        // System.out.println("Leaving helper function. shouldDelete = " + shouldDelete);
         return shouldDelete;
     }
 

@@ -63,7 +63,6 @@ public class ChessPiece {
         // Need to delete all these variables. Just make new position objects as needed
         // as I loop through
         if (board.getPiece(myPosition).type == ChessPiece.PieceType.ROOK) {
-            // System.out.println("Generating moves for Rook");
             directions = new int[][] {
                     { 1, 0 },
                     { 0, 1 },
@@ -71,7 +70,6 @@ public class ChessPiece {
                     { 0, -1 }
             };
         } else if (board.getPiece(myPosition).type == ChessPiece.PieceType.KNIGHT) {
-            // System.out.println("Generating moves for Knight");
             directions = new int[][] {
                     { 2, 1 },
                     { 2, -1 },
@@ -84,7 +82,6 @@ public class ChessPiece {
             };
 
         } else if (board.getPiece(myPosition).type == ChessPiece.PieceType.BISHOP) {
-            // System.out.println("Generating moves for Bishop");
             directions = new int[][] {
                     { 1, 1 },
                     { 1, -1 },
