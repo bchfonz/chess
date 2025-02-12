@@ -14,7 +14,7 @@ public class ChessGame {
     private ChessBoard currentBoard = new ChessBoard();
     private Collection<ChessMove> legalMoves = new ArrayList<>();
     public ChessGame() {
-
+        currentBoard.resetBoard();
     }
 
     /**
@@ -150,30 +150,32 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         boolean isInCheck = false;
         ChessPosition kingPosition = null;
+        ChessPiece enemyPiece;
+        ChessPosition enemyPosition;
         //Finds king piece
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
                 if(currentBoard.getPiece(new ChessPosition(i + 1, j + 1)) != null){
                     if(currentBoard.getBoard()[i][j].getPieceType() == ChessPiece.PieceType.KING && currentBoard.getBoard()[i][j].getTeamColor() == teamColor){
-                        kingPosition = new ChessPosition(i, j);
+                        kingPosition = new ChessPosition(i + 1, j + 1);
+                        System.out.println("King position: (" + kingPosition.getRow() + ", " + kingPosition.getColumn() + ")");
                     }
                 }
+                
                 
             }
         }
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
-                if(currentBoard.getPiece(new ChessPosition(i + 1, j + 1)) != null){
-                    ChessPosition enemyPosition = new ChessPosition(i + 1, j + 1);
-                    Collection<ChessMove> enemyMoves = new ArrayList<>();
-                    ChessPiece enemyPiece = currentBoard.getPiece(enemyPosition);
-                    enemyMoves = enemyPiece.pieceMoves(currentBoard, enemyPosition);
-                    for(ChessMove moves : enemyMoves){
-                        if(moves.getEndPosition() == kingPosition){
+                if(currentBoard.getBoard()[i][j] != null && currentBoard.getBoard()[i][j].getTeamColor() != teamColor){
+                        enemyPiece = currentBoard.getBoard()[i][j];
+                        enemyPosition = new ChessPosition(i + 1, j + 1);
+                        System.out.println("Enemy position: (" + enemyPosition.getRow() + ", " + enemyPosition.getColumn() + ")");
+                        if(isInCheckHelper(kingPosition, enemyPosition, enemyPiece)){
+                            System.out.println("Is in check");
                             isInCheck = true;
                         }
-                    }
-                    
+    
                 }
                 
                 
@@ -182,10 +184,15 @@ public class ChessGame {
         return isInCheck;
     }
     public boolean isInCheckHelper(ChessPosition kingPosition, ChessPosition enemyPosition, ChessPiece enemyPiece){
+        System.out.println("In check helper. Enemy piece = " + enemyPiece);
         boolean check = false;
-        Collection<ChessMove> enemyMoves = enemyPiece.pieceMoves(currentBoard, enemyPosition);
-        for(ChessMove moves : enemyMoves){
-            if(moves.getEndPosition() == kingPosition){
+        // Collection<ChessMove> enemyMoves = new ArrayList<>();
+        // enemyMoves = enemyPiece.pieceMoves(currentBoard, enemyPosition);
+        for(ChessMove moves : enemyPiece.pieceMoves(currentBoard, enemyPosition)){
+            System.out.println("King position: (" + kingPosition.getRow() + ", " + kingPosition.getColumn() + ")");
+            System.out.println("moves.getEndPosition() = (" + moves.getEndPosition().getRow() + ", " + moves.getEndPosition().getColumn() + ")");
+            if(moves.getEndPosition().getRow() == kingPosition.getRow() && moves.getEndPosition().getColumn() == kingPosition.getColumn()){
+                System.out.println("Is in check from check helper");
                 check = true;
             }
         }
