@@ -150,28 +150,30 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         boolean isInCheck = false;
         ChessPosition kingPosition = null;
-        ChessPiece enemyPiece;
-        ChessPosition enemyPosition;
         //Finds king piece
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
-                if(currentBoard.getBoard()[i][j].getPieceType() == ChessPiece.PieceType.KING && currentBoard.getBoard()[i][j].getTeamColor() == teamColor){
-                    kingPosition = new ChessPosition(i, j);
+                if(currentBoard.getPiece(new ChessPosition(i + 1, j + 1)) != null){
+                    if(currentBoard.getBoard()[i][j].getPieceType() == ChessPiece.PieceType.KING && currentBoard.getBoard()[i][j].getTeamColor() == teamColor){
+                        kingPosition = new ChessPosition(i, j);
+                    }
                 }
                 
             }
         }
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
-                if(currentBoard.getBoard()[i][j] != null){
-                    if(currentBoard.getBoard()[i][j].getPieceType() != null && currentBoard.getBoard()[i][j].getTeamColor() != teamColor){
-                        enemyPiece = currentBoard.getBoard()[i][j];
-                        enemyPosition = new ChessPosition(i, j);
-                        if(isInCheckHelper(kingPosition, enemyPosition, enemyPiece)){
+                if(currentBoard.getPiece(new ChessPosition(i + 1, j + 1)) != null){
+                    ChessPosition enemyPosition = new ChessPosition(i + 1, j + 1);
+                    Collection<ChessMove> enemyMoves = new ArrayList<>();
+                    ChessPiece enemyPiece = currentBoard.getPiece(enemyPosition);
+                    enemyMoves = enemyPiece.pieceMoves(currentBoard, enemyPosition);
+                    for(ChessMove moves : enemyMoves){
+                        if(moves.getEndPosition() == kingPosition){
                             isInCheck = true;
                         }
-    
                     }
+                    
                 }
                 
                 
