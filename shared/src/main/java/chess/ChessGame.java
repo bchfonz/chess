@@ -31,12 +31,8 @@ public class ChessGame {
      * The function will change teamTurn from whatever color team is to the other color
      */
     public void setTeamTurn(TeamColor team) {
-        // teamTurn = team;
-        if(team == TeamColor.WHITE){    
-            teamTurn = TeamColor.BLACK;
-        }else{
-            teamTurn = TeamColor.WHITE;
-        }
+        teamTurn = team;
+        
     }
 
     /**
@@ -112,42 +108,37 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        System.out.println("?");
-        if(currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1].getTeamColor() != teamTurn){
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        ChessPiece tempPiece = currentBoard.getPiece(startPosition); 
+        if(tempPiece == null || tempPiece.getTeamColor() != teamTurn){
             throw new InvalidMoveException("Out of turn");
-        }
-        if(currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] == null){
-            throw new InvalidMoveException("Invalid move");
         }
         
         legalMoves = validMoves(move.getStartPosition());
         System.out.println("?");
-        boolean isValid = false;
-        if(legalMoves.contains(move) && currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] != null){
-            System.out.println("Valid move");
-            isValid = true;
-        }
-        // for(ChessMove tempMove : legalMoves){
-        //     if(move == tempMove){
-        //         isValid = true;
-        //     }
-        // }
-        if(!isValid){
+        if(!legalMoves.contains(move)){
             throw new InvalidMoveException("Invalid move");
+        }
+        
+        currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
+        if(move.getPromotionPiece() != null){
+            currentBoard.addPiece(endPosition, new ChessPiece(teamTurn, move.getPromotionPiece()));
         }else{
-            ChessPiece tempPiece = new ChessPiece(null, null);
-            if(move.getPromotionPiece() != null){
-                tempPiece = new ChessPiece(currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1].getTeamColor(), move.getPromotionPiece());
-            }else{
-                tempPiece = currentBoard.getPiece(move.getStartPosition());
-            }
-            currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = tempPiece;
-            currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
-            System.out.println("Move made. Start Postition (" + move.getStartPosition().getRow() + ", " + move.getStartPosition().getColumn() + ") = " + currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1]);
-            System.out.println("End Postition (" + move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ") = " + currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1]);
-            setTeamTurn(currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1].getTeamColor());
-            // isInCheck(teamTurn);
-        }  
+            currentBoard.addPiece(endPosition, tempPiece);
+        }
+
+        // currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = tempPiece;
+        
+        System.out.println("Move made. Start Postition (" + move.getStartPosition().getRow() + ", " + move.getStartPosition().getColumn() + ") = " + currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1]);
+        System.out.println("End Postition (" + move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ") = " + currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1]);
+        if(teamTurn == TeamColor.WHITE){    
+            teamTurn = TeamColor.BLACK;
+        }else{
+            teamTurn = TeamColor.WHITE;
+        }
+        // isInCheck(teamTurn);
+
     }
 
     /**
