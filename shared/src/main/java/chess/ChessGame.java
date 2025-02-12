@@ -69,8 +69,7 @@ public class ChessGame {
                 newLegalMoves.add(curMove);
             }
         }
-        legalMoves = newLegalMoves;
-        return legalMoves;
+        return newLegalMoves;
     }
 
     public boolean deleteMove(ChessBoard tempBoard, ChessMove move, ChessPiece curPiece){
@@ -113,20 +112,41 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        boolean isValid = false;
-        for(ChessMove tempMove : legalMoves){
-            if(move == tempMove){
-                isValid = true;
-            }
+        System.out.println("?");
+        if(currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1].getTeamColor() != teamTurn){
+            throw new InvalidMoveException("Out of turn");
         }
-        if(isValid){
-            ChessPiece tempPiece = currentBoard.getBoard()[move.getStartPosition().getRow()][move.getStartPosition().getColumn()];
-            currentBoard.getBoard()[move.getStartPosition().getRow()][move.getStartPosition().getColumn()] = null;
-            currentBoard.getBoard()[move.getStartPosition().getRow()][move.getStartPosition().getColumn()] = tempPiece;
-            setTeamTurn(teamTurn);
-            isInCheck(teamTurn);
-        }else{
+        if(currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] == null){
             throw new InvalidMoveException("Invalid move");
+        }
+        
+        legalMoves = validMoves(move.getStartPosition());
+        System.out.println("?");
+        boolean isValid = false;
+        if(legalMoves.contains(move) && currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] != null){
+            System.out.println("Valid move");
+            isValid = true;
+        }
+        // for(ChessMove tempMove : legalMoves){
+        //     if(move == tempMove){
+        //         isValid = true;
+        //     }
+        // }
+        if(!isValid){
+            throw new InvalidMoveException("Invalid move");
+        }else{
+            ChessPiece tempPiece = new ChessPiece(null, null);
+            if(move.getPromotionPiece() != null){
+                tempPiece = new ChessPiece(currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1].getTeamColor(), move.getPromotionPiece());
+            }else{
+                tempPiece = currentBoard.getPiece(move.getStartPosition());
+            }
+            currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = tempPiece;
+            currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
+            System.out.println("Move made. Start Postition (" + move.getStartPosition().getRow() + ", " + move.getStartPosition().getColumn() + ") = " + currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1]);
+            System.out.println("End Postition (" + move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ") = " + currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1]);
+            setTeamTurn(currentBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1].getTeamColor());
+            // isInCheck(teamTurn);
         }  
     }
 
@@ -152,14 +172,17 @@ public class ChessGame {
         }
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
-                if(currentBoard.getBoard()[i][j].getPieceType() != null && currentBoard.getBoard()[i][j].getTeamColor() != teamColor){
-                    enemyPiece = currentBoard.getBoard()[i][j];
-                    enemyPosition = new ChessPosition(i, j);
-                    if(isInCheckHelper(kingPosition, enemyPosition, enemyPiece)){
-                        isInCheck = true;
+                if(currentBoard.getBoard()[i][j] != null){
+                    if(currentBoard.getBoard()[i][j].getPieceType() != null && currentBoard.getBoard()[i][j].getTeamColor() != teamColor){
+                        enemyPiece = currentBoard.getBoard()[i][j];
+                        enemyPosition = new ChessPosition(i, j);
+                        if(isInCheckHelper(kingPosition, enemyPosition, enemyPiece)){
+                            isInCheck = true;
+                        }
+    
                     }
-
                 }
+                
                 
             }
         }
