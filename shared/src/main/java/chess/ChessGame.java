@@ -88,7 +88,7 @@ public class ChessGame {
                     for (ChessMove moves : tempPieceMoves) {
                         if (tempBoard.getBoard()[moves.getEndPosition().getRow() - 1][moves.getEndPosition().getColumn() - 1] == null) {
                             continue;
-                        } else if (tempBoard.getBoard()[moves.getEndPosition().getRow() - 1][moves.getEndPosition().getColumn() - 1].getPieceType() == ChessPiece.PieceType.KING) {
+                        } else if (tempBoard.getPiece(moves.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING) {
                             shouldDelete = true;
                         }
                     }

@@ -184,7 +184,9 @@ public class ChessPiece {
                     { -1, 1 }
             };
         }
-        if (board.getPiece(myPosition).type != ChessPiece.PieceType.KING && board.getPiece(myPosition).type != ChessPiece.PieceType.PAWN && board.getPiece(myPosition).type != ChessPiece.PieceType.KNIGHT) {
+        if (board.getPiece(myPosition).type != ChessPiece.PieceType.KING 
+        && board.getPiece(myPosition).type != ChessPiece.PieceType.PAWN 
+        && board.getPiece(myPosition).type != ChessPiece.PieceType.KNIGHT) {
             // Loops through every possible direction
             for (int[] direction : directions) {
                 int row = startRow + direction[0];
