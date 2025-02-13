@@ -25,7 +25,7 @@ public class ChessBoard {
         }
     }
 
-    public ChessPiece[][] getBoard() {
+    public ChessPiece[][] getChessBoard() {
         return board;
     }
 

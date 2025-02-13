@@ -74,26 +74,33 @@ public class ChessGame {
         // Makes move on copied board
         // tempBoard.addPiece(move.getStartPosition(), null);
         // tempBoard.addPiece(move.getEndPosition(), tempPiece);
-        tempBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
-        tempBoard.getBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = curPiece;
+        tempBoard.getChessBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
+        tempBoard.getChessBoard()[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = curPiece;
         // Loops to check the moves of each major enemy piece
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (tempBoard.getBoard()[row][col] != null && tempBoard.getBoard()[row][col].getTeamColor() != curPiece.getTeamColor()) {
+                if (tempBoard.getChessBoard()[row][col] != null && tempBoard.getChessBoard()[row][col].getTeamColor() != curPiece.getTeamColor()) {
                     // Gets all the possile enemy moves
                     ChessPosition tempPosition = new ChessPosition(row + 1, col + 1);
                     tempPiece = tempBoard.getPiece(tempPosition);
                     tempPieceMoves = tempPiece.pieceMoves(tempBoard, tempPosition);
-                    // Loops through enemy moves
-                    for (ChessMove moves : tempPieceMoves) {
-                        if (tempBoard.getBoard()[moves.getEndPosition().getRow() - 1][moves.getEndPosition().getColumn() - 1] == null) {
-                            continue;
-                        } else if (tempBoard.getPiece(moves.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING) {
-                            shouldDelete = true;
-                        }
+                    if(deleteMoveHelper(tempBoard, tempPieceMoves)){
+                        shouldDelete = true;
                     }
                 }
 
+            }
+        }
+        return shouldDelete;
+    }
+    public boolean deleteMoveHelper(ChessBoard tempBoard, Collection<ChessMove> tempPieceMoves){
+        boolean shouldDelete = false;
+        // Loops through enemy moves
+        for (ChessMove moves : tempPieceMoves) {
+            if (tempBoard.getChessBoard()[moves.getEndPosition().getRow() - 1][moves.getEndPosition().getColumn() - 1] == null) {
+                continue;
+            } else if (tempBoard.getPiece(moves.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING) {
+                shouldDelete = true;
             }
         }
         return shouldDelete;
@@ -118,7 +125,7 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid move");
         }
 
-        currentBoard.getBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
+        currentBoard.getChessBoard()[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
         if (move.getPromotionPiece() != null) {
             currentBoard.addPiece(endPosition, new ChessPiece(teamTurn, move.getPromotionPiece()));
         } else {
@@ -150,8 +157,8 @@ public class ChessGame {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (currentBoard.getPiece(new ChessPosition(i + 1, j + 1)) != null) {
-                    if (currentBoard.getBoard()[i][j].getPieceType() == ChessPiece.PieceType.KING
-                            && currentBoard.getBoard()[i][j].getTeamColor() == teamColor) {
+                    if (currentBoard.getChessBoard()[i][j].getPieceType() == ChessPiece.PieceType.KING
+                            && currentBoard.getChessBoard()[i][j].getTeamColor() == teamColor) {
                         kingPosition = new ChessPosition(i + 1, j + 1);
 
                     }
@@ -161,9 +168,9 @@ public class ChessGame {
         }
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (currentBoard.getBoard()[i][j] != null
-                        && currentBoard.getBoard()[i][j].getTeamColor() != teamColor) {
-                    enemyPiece = currentBoard.getBoard()[i][j];
+                if (currentBoard.getChessBoard()[i][j] != null
+                        && currentBoard.getChessBoard()[i][j].getTeamColor() != teamColor) {
+                    enemyPiece = currentBoard.getChessBoard()[i][j];
                     enemyPosition = new ChessPosition(i + 1, j + 1);
                     if (isInCheckHelper(kingPosition, enemyPosition, enemyPiece)) {
                         isInCheck = true;
