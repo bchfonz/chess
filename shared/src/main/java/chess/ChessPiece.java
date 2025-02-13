@@ -83,18 +83,8 @@ public class ChessPiece {
                     { 1, -1 },
                     { -1, -1 }
             };
-        } else if (board.getPiece(myPosition).type == ChessPiece.PieceType.QUEEN) {
-            directions = new int[][] {
-                    { 1, 1 },
-                    { -1, 1 },
-                    { 1, -1 },
-                    { -1, -1 },
-                    { 1, 0 },
-                    { -1, 0 },
-                    { 0, 1 },
-                    { 0, -1 }
-            };
-        } else if (board.getPiece(myPosition).type == ChessPiece.PieceType.KING) {
+        } else if (board.getPiece(myPosition).type == ChessPiece.PieceType.QUEEN 
+        || board.getPiece(myPosition).type == ChessPiece.PieceType.KING) {
             directions = new int[][] {
                     { 1, 1 },
                     { -1, 1 },
@@ -109,31 +99,31 @@ public class ChessPiece {
             if (board.getPiece(myPosition).pieceColor == ChessGame.TeamColor.WHITE) {
                 if (myPosition.getRow() == 2) {
                     directions = new int[][] {
-                            { 1, 0 },
-                            { 2, 0 },
                             { 1, 1 },
-                            { 1, -1 }
+                            { 1, -1 },
+                            { 1, 0 },
+                            { 2, 0 }
                     };
                 } else {
                     directions = new int[][] {
-                            { 1, 0 },
                             { 1, 1 },
-                            { 1, -1 }
+                            { 1, -1 },
+                            { 1, 0 }
                     };
                 }
             } else if (board.getPiece(myPosition).pieceColor == ChessGame.TeamColor.BLACK) {
                 if (myPosition.getRow() == 7) {
                     directions = new int[][] {
-                            { -1, 0 },
-                            { -2, 0 },
                             { -1, 1 },
-                            { -1, -1 }
+                            { -1, -1 },
+                            { -1, 0 },
+                            { -2, 0 }
                     };
                 } else {
                     directions = new int[][] {
-                            { -1, 0 },
                             { -1, 1 },
-                            { -1, -1 }
+                            { -1, -1 },
+                            { -1, 0 }
                     };
                 }
 
@@ -148,27 +138,10 @@ public class ChessPiece {
             };
         }
         if (board.getPiece(myPosition).type != ChessPiece.PieceType.KING
-                && board.getPiece(myPosition).type != ChessPiece.PieceType.KNIGHT && board.getPiece(myPosition).type != ChessPiece.PieceType.PAWN) {
-            for (int[] direction : directions) {
-                int row = startRow + direction[0];
-                int col = startCol + direction[1];
-
-                while (row <= 8 && col <= 8 && row >= 1 && col >= 1) {
-                    ChessPosition newPosition = new ChessPosition(row, col);
-                    if (board.getPiece(newPosition) == null) {
-                        legalMoves.add(new ChessMove(myPosition, newPosition, null));
-                    } else {
-                        if (board.getPiece(newPosition).pieceColor == board.getPiece(myPosition).pieceColor) {
-                            break;
-                        } else {
-                            legalMoves.add(new ChessMove(myPosition, newPosition, null));
-                            break;
-                        }
-                    }
-                    row += direction[0];
-                    col += direction[1];
-                }
-            }
+                && board.getPiece(myPosition).type != ChessPiece.PieceType.KNIGHT 
+                && board.getPiece(myPosition).type != ChessPiece.PieceType.PAWN) {
+                    legalMoves = allOtherMoves(board, directions, myPosition, myPosition);
+            
         } else if (board.getPiece(myPosition).type == ChessPiece.PieceType.PAWN) {
             legalMoves = pawnMoves(board, directions, myPosition);
         } else if (board.getPiece(myPosition).type == ChessPiece.PieceType.KING
@@ -179,11 +152,41 @@ public class ChessPiece {
         return legalMoves;
     }
 
-    public Collection<ChessMove> pawnMoves(ChessBoard board, int[][] directions, ChessPosition startPosition) {
+    public Collection<ChessMove> allOtherMoves(ChessBoard board, int[][] directions, ChessPosition myPosition, ChessPosition startPosition){
         Collection<ChessMove> legalMoves = new ArrayList<>();
         int startRow = startPosition.getRow();
         int startCol = startPosition.getColumn();
         for (int[] direction : directions) {
+            int row = startRow + direction[0];
+            int col = startCol + direction[1];
+
+            while (row <= 8 && col <= 8 && row >= 1 && col >= 1) {
+                ChessPosition newPosition = new ChessPosition(row, col);
+                if (board.getPiece(newPosition) == null) {
+                    legalMoves.add(new ChessMove(myPosition, newPosition, null));
+                } else {
+                    if (board.getPiece(newPosition).pieceColor == board.getPiece(myPosition).pieceColor) {
+                        break;
+                    } else {
+                        legalMoves.add(new ChessMove(myPosition, newPosition, null));
+                        break;
+                    }
+                }
+                row += direction[0];
+                col += direction[1];
+            }
+        }
+        return legalMoves;
+    }
+
+    public Collection<ChessMove> pawnMoves(ChessBoard board, int[][] directions, ChessPosition startPosition) {
+        Collection<ChessMove> legalMoves = new ArrayList<>();
+        int startRow = startPosition.getRow();
+        int startCol = startPosition.getColumn();
+        
+        for (int[] direction : directions) {
+            boolean addMoves = false;;
+            boolean addPromotionMoves = false;
             int row = startRow + direction[0];
             int col = startCol + direction[1];
             if (row > 8 || col > 8 || row < 1 || col < 1) {
@@ -192,45 +195,39 @@ public class ChessPiece {
             ChessPosition newPosition = new ChessPosition(row, col);
             if (col == startCol) {
                 if (board.getPiece(newPosition) == null) {
+                    addMoves = true;
                     if (row == 8 || row == 1) {
-                        legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.BISHOP));
-                        legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.KNIGHT));
-                        legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.QUEEN));
-                        legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.ROOK));
+                        addPromotionMoves = true;
                     } else {
-                        legalMoves.add(new ChessMove(startPosition, newPosition, null));
+                        addPromotionMoves = false;
                     }
                 }
                 else{
                     break;
                 }
 
-            }
-        }
-        for (int[] direction : directions) {
-            int row = startRow + direction[0];
-            int col = startCol + direction[1];
-            if (row > 8 || col > 8 || row < 1 || col < 1) {
-                continue;
-            }
-            ChessPosition newPosition = new ChessPosition(row, col);
-            if (col != startCol) {
+            } else if (col != startCol) {
                 if (board.getPiece(newPosition) != null) {
                     if (board.getPiece(newPosition).pieceColor != board.getPiece(startPosition).pieceColor) {
+                        addMoves = true;
                         if (row == 8 || row == 1) {
-                            legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.BISHOP));
-                            legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.KNIGHT));
-                            legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.QUEEN));
-                            legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.ROOK));
+                            addPromotionMoves = true;
                         } else {
-                            legalMoves.add(new ChessMove(startPosition, newPosition, null));
+                            addPromotionMoves = false;
                         }
                     }
                 }
 
             }
+            if(addMoves && addPromotionMoves){
+                legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.BISHOP));
+                legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.KNIGHT));
+                legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.QUEEN));
+                legalMoves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.ROOK));
+            }else if(addMoves && !addPromotionMoves){
+                legalMoves.add(new ChessMove(startPosition, newPosition, null));
+            }
         }
-
         return legalMoves;
     }
 
@@ -270,17 +267,22 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj){
             return true;
-        if (obj == null)
+        }
+        if (obj == null){
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()){
             return false;
+        }
         ChessPiece other = (ChessPiece) obj;
-        if (pieceColor != other.pieceColor)
+        if (pieceColor != other.pieceColor){
             return false;
-        if (type != other.type)
+        }
+        if (type != other.type){
             return false;
+        }
         return true;
     }
 
