@@ -267,25 +267,33 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj){
             return true;
-        if (obj == null)
+        }
+        if (obj == null){
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()){
             return false;
+        }
         ChessGame other = (ChessGame) obj;
-        if (teamTurn != other.teamTurn)
+        if (teamTurn != other.teamTurn){
             return false;
+        }
         if (currentBoard == null) {
-            if (other.currentBoard != null)
+            if (other.currentBoard != null){
                 return false;
-        } else if (!currentBoard.equals(other.currentBoard))
+            }
+        } else if (!currentBoard.equals(other.currentBoard)){
             return false;
+        }
         if (legalMoves == null) {
-            if (other.legalMoves != null)
+            if (other.legalMoves != null){
                 return false;
-        } else if (!legalMoves.equals(other.legalMoves))
+            }
+        } else if (!legalMoves.equals(other.legalMoves)){
             return false;
+        }
         return true;
     }
 }
