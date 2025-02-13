@@ -63,7 +63,6 @@ public class ChessPiece {
         // Need to delete all these variables. Just make new position objects as needed
         // as I loop through
         if (board.getPiece(myPosition).type == ChessPiece.PieceType.ROOK) {
-            // System.out.println("Generating rook moves");
             directions = new int[][] {
                     { 1, 0 },
                     { 0, 1 },
@@ -114,7 +113,6 @@ public class ChessPiece {
             };
             
         }else if (board.getPiece(myPosition).type == ChessPiece.PieceType.PAWN) {
-            System.out.println("Generating Pawn moves");
             if(board.getPiece(myPosition).pieceColor == ChessGame.TeamColor.WHITE) {
                 if(myPosition.getRow() == 2) {
                     directions = new int [][]{
@@ -157,30 +155,23 @@ public class ChessPiece {
                 ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
                 //Moving straight ahead
                 if(col == startCol && pieceAtNewPosition == null) {
-                    System.out.println("Pawn moving straight");
                     if(newPosition.getRow() == 8 || newPosition.getRow() == 1) {
-                        System.out.println("Pawn moving straight + promoted");
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
                     }else{
-                        System.out.println("Pawn moving straight and not promoted");
                         legalMoves.add(new ChessMove(myPosition, newPosition, null));
                     }
                 }else if(col == startCol && pieceAtNewPosition != null && (startRow == 2 || startRow == 7)) {
-                    System.out.println("Not a valid move. breaking out of loop");
                     break;
                 }else if(col != startCol && pieceAtNewPosition != null && pieceAtNewPosition.pieceColor != board.getPiece(myPosition).pieceColor) {
-                    System.out.println("Pawn moving diagonal");
                     if(newPosition.getRow() == 8 || newPosition.getRow() == 1) {
-                        System.out.println("Pawn moving diagonal + promoted");
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
                         legalMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
                     }else {
-                        System.out.println("Pawn moving diagonal and not promoted");
                         legalMoves.add(new ChessMove(myPosition, newPosition, null));
                     }
                 }

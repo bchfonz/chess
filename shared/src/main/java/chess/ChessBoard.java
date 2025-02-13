@@ -55,7 +55,6 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        System.out.println("Resetting board");
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
                 //Sets major white pieces
@@ -140,7 +139,6 @@ public class ChessBoard {
                 }
             }
         }
-        System.out.println("Finished resetting board");
     }
 
     @Override
