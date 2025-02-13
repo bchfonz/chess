@@ -206,15 +206,13 @@ public class ChessPiece {
                     break;
                 }
 
-            } else if (col != startCol) {
-                if (board.getPiece(newPosition) != null) {
-                    if (board.getPiece(newPosition).pieceColor != board.getPiece(startPosition).pieceColor) {
-                        addMoves = true;
-                        if (row == 8 || row == 1) {
-                            addPromotionMoves = true;
-                        } else {
-                            addPromotionMoves = false;
-                        }
+            } else if (col != startCol && board.getPiece(newPosition) != null) {
+                if (board.getPiece(newPosition).pieceColor != board.getPiece(startPosition).pieceColor) {
+                    addMoves = true;
+                    if (row == 8 || row == 1) {
+                        addPromotionMoves = true;
+                    } else {
+                        addPromotionMoves = false;
                     }
                 }
 
