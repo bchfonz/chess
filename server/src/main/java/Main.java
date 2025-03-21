@@ -13,22 +13,19 @@ public class Main {
         Server testServer = new Server();
         int port = testServer.run(8000); // Choose a port (default: 4567)
         System.out.println("Server running on port: " + port);
-        Spark.get("/test_endpoint", (req, res) -> {
-        return "{\"message\": \"Hello from Spark Java!\"}";
+        Spark.post("/test_endpoint", (req, res) -> {
+
+            // String username = req.queryParams("username");
+            // String password = req.queryParams("password");
+            // System.out.println(username + " " + password);
+
+            // Simulate user creation
+            // In a real application, you would interact with your data access layer here
+            return "{\"message\": \"User created!\"}";
         });
 
         // Practice creating endpoints here
-        Spark.get("/user", (req, res) -> {
-            // Handle user creation logic here
-            try {
-                // Simulate user creation
-                // In a real application, you would interact with your data access layer here
-                return "{\"message\": \"User created!\"}";
-            } catch (Exception e) {
-                res.status(500);
-                return "{\"error\": \"Failed to create user.\"}";
-            }
-        });
+
     }
 
 }
