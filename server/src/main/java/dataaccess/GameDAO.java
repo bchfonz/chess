@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface GameDAO {
-  public final Map<Integer, GameData> games = new HashMap<>();
+  
   GameData createGame(GameData gameData) throws DataAccessException;
   GameData updateGame (GameData gameData) throws DataAccessException;
   GameData getGame(int gameID) throws DataAccessException;

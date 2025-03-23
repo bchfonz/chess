@@ -7,12 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryUserDAO implements UserDAO {
-    @Override
+    private final Map<String, UserData> users = new HashMap<>();
     public UserData createUser(UserData userData) throws DataAccessException {
         users.put(userData.username(), userData);
         return userData;
     }
-    @Override
     public UserData getUser() throws DataAccessException {
         // Assuming we want to return the first user in the map
         if (users.isEmpty()) {
@@ -20,7 +19,6 @@ public class MemoryUserDAO implements UserDAO {
         }
         return users.values().iterator().next();
     }
-    @Override
     public void clearData() {
         users.clear();
     }
