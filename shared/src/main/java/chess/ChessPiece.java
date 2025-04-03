@@ -54,8 +54,8 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> legalMoves = new ArrayList<>();
-        int startRow = myPosition.getRow();
-        int startCol = myPosition.getColumn();
+        // int startRow = myPosition.getRow();
+        // int startCol = myPosition.getColumn();
         int[][] directions;
 
         if (board.getPiece(myPosition).type == ChessPiece.PieceType.ROOK) {

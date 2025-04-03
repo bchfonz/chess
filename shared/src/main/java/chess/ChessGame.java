@@ -56,7 +56,6 @@ public class ChessGame {
         Collection<ChessMove> newLegalMoves = new ArrayList<>();
         ChessPiece curPiece = currentBoard.getPiece(startPosition);
         legalMoves = curPiece.pieceMoves(currentBoard, startPosition);
-        int i = 0;
         for (ChessMove curMove : legalMoves) {
             
             ChessBoard tempBoard = new ChessBoard(currentBoard);

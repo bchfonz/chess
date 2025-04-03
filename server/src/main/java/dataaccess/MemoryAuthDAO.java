@@ -8,10 +8,17 @@ import java.util.UUID;
 
 
 public class MemoryAuthDAO implements AuthDAO {
+    // private String username;
+    // private String authToken;
     private final Map<String, AuthData> authTokens = new HashMap<>();
+    // public MemoryAuthDAO(String username){
+    //     this.username = username;
+    //     authToken = generateToken();
+    // }
     public AuthData createAuth(String username) throws DataAccessException {
         String token = generateToken();
         AuthData authData = new AuthData(token, username);
+        authTokens.put(username, authData);
         return authData;
     }
 
@@ -23,7 +30,7 @@ public class MemoryAuthDAO implements AuthDAO {
         return authTokens.remove(username);
     }
 
-    public void clearData() {
+    public void clearAuth() {
         authTokens.clear();
     }
 
