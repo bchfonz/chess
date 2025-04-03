@@ -11,6 +11,7 @@ import java.util.*;
 
 public class Server {
     // private final Service service = new Service(null, null, null);
+    Gson gson = new Gson();
     UserService userServiceObject = new UserService();
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -24,7 +25,7 @@ public class Server {
         Spark.init();
 
         Spark.post("/user", this::registerUser);
-        Spark.get("/session", this::login);
+        Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
@@ -39,8 +40,7 @@ public class Server {
 
     }
     private Object registerUser (Request req, Response res) {
-        Gson gson = new Gson();
-        UserData userData = gson.fromJson(req.body(), UserData.class); // Convert JSON to Java Object
+        // UserData userData = gson.fromJson(req.body(), UserData.class); // Convert JSON to Java Object
         RegisterRequest user = gson.fromJson(req.body(), RegisterRequest.class);
         RegisterResult regResult = userServiceObject.register(user ,res);
         System.out.println(res.status());
@@ -68,7 +68,9 @@ public class Server {
     }
 
     private Object login (Request req, Response res) {
-        return "";
+        LoginRequest loginData = gson.fromJson(req.body(), LoginRequest.class);
+        LoginResult loginResult = userServiceObject.login(loginData, res);
+        return gson.toJson(loginResult);
     }
     private Object logout (Request req, Response res) {
         return "";
