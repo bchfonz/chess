@@ -18,6 +18,14 @@ public class MemoryUserDAO implements UserDAO {
         // if (!users.containsKey(username)) {
         //     return null;
         // }
+        System.out.println("In get user");
+        if(users.containsKey(username)){
+            UserData testUser = users.get(username);
+            System.out.println("Username from testUser: " + testUser.username());
+            System.out.println("Password from testUser: " + testUser.password());
+        }
+        
+        
         return users.get(username);
     }
     public boolean userExists (String username){

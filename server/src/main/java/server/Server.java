@@ -73,7 +73,12 @@ public class Server {
         return gson.toJson(loginResult);
     }
     private Object logout (Request req, Response res) {
-        return "";
+        String authToken = gson.fromJson(req.headers("authorization"), String.class);
+        System.out.println("In logout. String authToken = " + authToken);
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        LogoutResult logoutResult = userServiceObject.logout(logoutRequest, res);
+        System.out.println(logoutRequest.authToken());
+        return gson.toJson(logoutResult);
     }
     private Object listGames (Request req, Response res) {
         return "";

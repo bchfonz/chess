@@ -18,16 +18,25 @@ public class MemoryAuthDAO implements AuthDAO {
     public AuthData createAuth(String username) throws DataAccessException {
         String token = generateToken();
         AuthData authData = new AuthData(token, username);
-        authTokens.put(username, authData);
+        authTokens.put(token, authData);
         return authData;
     }
 
-    public AuthData getAuthData(String username) throws DataAccessException {
-        return authTokens.get(username);
+    public AuthData getAuthData(String authToken) throws DataAccessException {
+        return authTokens.get(authToken);
     }
 
-    public AuthData deleteAuth(String username) throws DataAccessException {
-        return authTokens.remove(username);
+    public boolean deleteAuth(String authToken) throws DataAccessException {
+        System.out.println("In delete auth");
+        if(getAuthData(authToken) == null){
+            System.out.println("AuthData didn't exist");
+            return false;
+        }else{
+            System.out.println("Deleting AuthData");
+            authTokens.remove(authToken);
+            return true;
+        }
+
     }
 
     public void clearAuth() {

@@ -4,6 +4,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.UserData;
+import model.AuthData;
 import spark.*;
 public class UserService {
 
@@ -24,12 +25,12 @@ public class UserService {
 				return new RegisterResult(null, null, message);
 			}else{
 				String username = registerRequest.username();
-				authDAO.createAuth(username);
-				String authToken =  authDAO.getAuthData(username).authToken();
+				AuthData tempAuthData = authDAO.createAuth(username);
+				// String authToken =  tempAuthData.authToken();
 				userDAO.createUser(new UserData(username, registerRequest.password(), registerRequest.email()));
 				
 				res.status(200);
-				return new RegisterResult(username, authToken, message);
+				return new RegisterResult(username, tempAuthData.authToken(), message);
 			}
 		}catch(DataAccessException e){
 			message = "Error: (description of error)";
@@ -48,7 +49,9 @@ public class UserService {
 			UserData userData = userDAO.getUser(loginRequest.username());
 			if(userData != null){
 				username = userData.username();
+				System.out.println("Attempted username 2: " + username);
 				password = userData.password();
+				System.out.println("Attempted password 2: " + password);
 			}
 			System.out.println("DAO username: " + username);
 			if(userData == null || !loginRequest.password().equals(password)){
@@ -58,8 +61,8 @@ public class UserService {
 			}else{
 				System.out.println("passwords match");
 				message = null;
-				authDAO.createAuth(userData.username());
-				String authToken =  authDAO.getAuthData(username).authToken();
+				AuthData tempAuthData = authDAO.createAuth(userData.username());
+				String authToken =  tempAuthData.authToken();
 				res.status(200);
 				return new LoginResult(userData.username(), authToken, message);
 			}
@@ -68,10 +71,22 @@ public class UserService {
 			res.status(500);
 			return new LoginResult(null, null, message);
 		}
-		//Check if username is in database
-		//Verify password
-		//Send response based on previous two comments
 	}
 
-	public void logout(LogoutRequest logoutRequest) {}
+	public LogoutResult logout(LogoutRequest logoutRequest, Response res) {
+		try{
+			if(authDAO.deleteAuth(logoutRequest.authToken())){
+				res.status(200);
+				return new LogoutResult(null);
+				
+			}else{
+				res.status(401);
+				return new LogoutResult("Error: unauthorized");
+			}
+		}catch(DataAccessException e){
+			res.status(500);
+			return new LogoutResult("Error: (description of error)");
+		}
+		
+	}
 }
