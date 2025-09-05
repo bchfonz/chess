@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,14 +36,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
 
     /**
@@ -53,6 +54,99 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> chessMoves = new ArrayList<>();
+        int [][] directions;
+        ChessPiece piece = board.getPiece(myPosition);
+        if(piece.type == PieceType.BISHOP){
+            directions =  new int[][]{
+                {1,1},
+                {1,-1},
+                {-1,1},
+                {-1,-1}
+            };
+        }
+        else if(piece.type == PieceType.KNIGHT){
+            directions =  new int[][]{
+                    {2,1},
+                    {2,-1},
+                    {-2,1},
+                    {-2,-1},
+                    {1,2},
+                    {1,-2},
+                    {-1,2},
+                    {-1,-2}
+            };
+        }
+        else if(piece.type == PieceType.ROOK){
+            directions =  new int[][]{
+                    {1,0},
+                    {-1,0},
+                    {0,1},
+                    {0,-1}
+            };
+
+        }
+        else if(piece.type == PieceType.PAWN){
+            if(piece.pieceColor == ChessGame.TeamColor.WHITE){
+                if(myPosition.getRow() == 2){
+                    directions = new int[][]{
+                        {1,0},
+                        {2,0}
+                    };
+                }
+                else{
+                    directions = new int[][]{
+                        {1,0}
+                    };
+                }
+            }
+            else{
+                if(myPosition.getRow() == 7){
+                    directions = new int[][]{
+                        {-1,0},
+                        {-2,0}
+                    };
+                }
+                else{
+                    directions = new int[][]{
+                            {-1,0}
+                    };
+                }
+            }
+
+
+        }
+        else if(piece.type == PieceType.QUEEN){
+            directions =  new int[][]{
+                    {1,1},
+                    {1,-1},
+                    {-1,1},
+                    {-1,-1},
+                    {1,0},
+                    {-1,0},
+                    {0,1},
+                    {0,-1}
+            };
+
+        }
+        else if(piece.type == PieceType.KING){
+            directions =  new int[][]{
+                    {1,1},
+                    {1,-1},
+                    {-1,1},
+                    {-1,-1},
+                    {1,0},
+                    {-1,0},
+                    {0,1},
+                    {0,-1}
+            };
+
+        }
+        else{
+            directions = new int[][]{
+                {0,0}
+            };
+        }
         return List.of();
     }
 }
