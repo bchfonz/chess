@@ -152,8 +152,38 @@ public class ChessPiece {
         if(piece.type == PieceType.BISHOP || piece.type == PieceType.ROOK || piece.type == PieceType.QUEEN){
             return allOtherMoves(board, myPosition, directions);
         }
+        else if(piece.type == PieceType.KING || piece.type == PieceType.KNIGHT){
+            return kingAndKnightMoves(board, myPosition, directions);
+        }
 
         return List.of();
+    }
+
+
+    private Collection<ChessMove> kingAndKnightMoves(ChessBoard board, ChessPosition myPosition, int[][] directions){
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece myPiece = board.getPiece(myPosition);
+        for(int[] direction : directions){
+            int curRow = myPosition.getRow();
+            int curCol = myPosition.getColumn();
+            curRow += direction[0];
+            curCol += direction[1];
+            if(curRow <= 8 && curRow > 0 && curCol <= 8 && curCol > 0){
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                ChessPiece curSquare = board.getPiece(curPosition);
+                if(curSquare == null){
+                    validMoves.add(new ChessMove(myPosition, curPosition, null));
+                }
+                else if(curSquare.pieceColor != myPiece.pieceColor){
+                    validMoves.add(new ChessMove(myPosition, curPosition, null));
+                }
+            }
+            else{
+                continue;
+            }
+
+        }
+        return validMoves;
     }
 
     private Collection<ChessMove> allOtherMoves(ChessBoard board, ChessPosition myPosition, int[][] directions){
