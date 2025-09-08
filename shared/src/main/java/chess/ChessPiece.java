@@ -88,16 +88,21 @@ public class ChessPiece {
 
         }
         else if(piece.type == PieceType.PAWN){
+            //I need to account for capturing a piece
             if(piece.pieceColor == ChessGame.TeamColor.WHITE){
                 if(myPosition.getRow() == 2){
                     directions = new int[][]{
                         {1,0},
+                        {1,1},
+                        {1,-1},
                         {2,0}
                     };
                 }
                 else{
                     directions = new int[][]{
-                        {1,0}
+                        {1,0},
+                        {1,1},
+                        {1,-1}
                     };
                 }
             }
@@ -105,12 +110,16 @@ public class ChessPiece {
                 if(myPosition.getRow() == 7){
                     directions = new int[][]{
                         {-1,0},
+                        {-1,1},
+                        {-1,-1},
                         {-2,0}
                     };
                 }
                 else{
                     directions = new int[][]{
-                            {-1,0}
+                        {-1,0},
+                        {-1,1},
+                        {-1,-1}
                     };
                 }
             }
@@ -178,10 +187,22 @@ public class ChessPiece {
                     validMoves.add(new ChessMove(myPosition, curPosition, null));
                 }
             }
-            else{
-                continue;
-            }
 
+        }
+        return validMoves;
+    }
+
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, int[][] directions){
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece myPiece = board.getPiece(myPosition);
+        for(int[] direction : directions) {
+            int curRow = myPosition.getRow();
+            int curCol = myPosition.getColumn();
+            curRow += direction[0];
+            curCol += direction[1];
+            if(curRow <= 8 && curRow > 0 && curCol <= 8 && curCol > 0){
+
+            }
         }
         return validMoves;
     }
