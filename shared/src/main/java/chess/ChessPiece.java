@@ -126,20 +126,7 @@ public class ChessPiece {
 
 
         }
-        else if(piece.type == PieceType.QUEEN){
-            directions =  new int[][]{
-                    {1,1},
-                    {1,-1},
-                    {-1,1},
-                    {-1,-1},
-                    {1,0},
-                    {-1,0},
-                    {0,1},
-                    {0,-1}
-            };
-
-        }
-        else if(piece.type == PieceType.KING){
+        else if(piece.type == PieceType.QUEEN || piece.type == PieceType.KING){
             directions =  new int[][]{
                     {1,1},
                     {1,-1},
@@ -157,7 +144,6 @@ public class ChessPiece {
                 {0,0}
             };
         }
-
         if(piece.type == PieceType.BISHOP || piece.type == PieceType.ROOK || piece.type == PieceType.QUEEN){
             return allOtherMoves(board, myPosition, directions);
         }
