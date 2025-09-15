@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -11,9 +12,14 @@ import java.util.Collection;
 public class ChessGame {
 
     private ChessBoard gameBoard = new ChessBoard();
-    private TeamColor curPlayer = TeamColor.WHITE;
+    private TeamColor curPlayer;
     public ChessGame() {
-
+        curPlayer = TeamColor.WHITE;
+        gameBoard.resetBoard();
+    }
+    public ChessGame(ChessGame copy){
+        this.gameBoard = new ChessBoard(copy.gameBoard);
+        this.curPlayer = copy.curPlayer;
     }
 
     /**
@@ -48,7 +54,20 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> updatedMoves = new ArrayList<>();
+        ChessPiece myPiece = gameBoard.getPiece(startPosition);
+        if(myPiece == null){
+            return null;
+        }
+        Collection<ChessMove> possibleMoves = myPiece.pieceMoves(gameBoard, startPosition);
+        /*
+        How to implement:
+        1. Copy the board
+        2. Make the move on the copied board
+        3. Check for chekcmate
+        4. Update the moves list
+                */
+        return updatedMoves;
     }
 
     /**

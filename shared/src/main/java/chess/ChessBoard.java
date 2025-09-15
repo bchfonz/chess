@@ -13,7 +13,19 @@ public class ChessBoard {
 
     private ChessPiece [][] board = new ChessPiece[8][8];
     public ChessBoard() {
-        
+
+    }
+    public ChessBoard(ChessBoard copy){
+        this.board = new ChessPiece[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (copy.board[i][j] != null) {
+                    this.board[i][j] = new ChessPiece(copy.board[i][j]); // Piece deep copy
+                } else {
+                    this.board[i][j] = null;
+                }
+            }
+        }
     }
 
     /**
