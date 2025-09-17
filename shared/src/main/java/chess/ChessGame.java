@@ -12,9 +12,8 @@ import java.util.Collection;
 public class ChessGame {
 
     private ChessBoard gameBoard = new ChessBoard();
-    private TeamColor curPlayer;
+    private TeamColor curPlayer = TeamColor.WHITE;
     public ChessGame() {
-        curPlayer = TeamColor.WHITE;
         gameBoard.resetBoard();
     }
     public ChessGame(ChessGame copy){
@@ -53,6 +52,13 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
+    /*
+        How to implement:
+        1. Copy the board
+        2. Make the move on the copied board
+        3. Check for chekcmate
+        4. Update the moves list
+                */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> updatedMoves = new ArrayList<>();
         ChessPiece myPiece = gameBoard.getPiece(startPosition);
@@ -60,13 +66,15 @@ public class ChessGame {
             return null;
         }
         Collection<ChessMove> possibleMoves = myPiece.pieceMoves(gameBoard, startPosition);
-        /*
-        How to implement:
-        1. Copy the board
-        2. Make the move on the copied board
-        3. Check for chekcmate
-        4. Update the moves list
-                */
+        ChessBoard copyBoard = new ChessBoard(gameBoard);
+        try{
+            for(ChessMove move : possibleMoves){
+                makeMove(move);
+            }
+        } catch (InvalidMoveException e) {
+//            throw new RuntimeException(e);
+        }
+
         return updatedMoves;
     }
 
@@ -87,7 +95,53 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        /*
+        Find the King's location.
+        Loop through all the other possible moves and see if any of the possible moves of the other team include the location of the king
+        */
+        Collection<ChessPiece> enemyPieces = new ArrayList<>();
+        boolean isInCheck;
+        ChessPosition kingPosition = null;
+        ChessPiece kingPiece;
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                ChessPosition curPosition = new ChessPosition(i,j);
+                ChessPiece curPiece = gameBoard.getPiece(curPosition);
+                if(curPiece != null){
+                    if(curPiece.getPieceType() == ChessPiece.PieceType.KING && curPiece.getTeamColor() == teamColor){
+                        kingPosition = curPosition;
+                        kingPiece = curPiece;
+                        break;
+                    }
+                }
+            }
+        }
+        return isInCheckHelper(kingPosition, teamColor);
+
+    }
+    private boolean isInCheckHelper(ChessPosition kingPosition, TeamColor team){
+        boolean isInCheck = false;
+        for(int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition curPosition = new ChessPosition(i,j);
+                ChessPiece curPiece = gameBoard.getPiece(curPosition);
+                if(curPiece != null){
+                    if(curPiece.getTeamColor() != team){
+                        Collection<ChessMove> enemyMoves = curPiece.pieceMoves(gameBoard, curPosition);
+                        for(ChessMove moves : enemyMoves){
+                            if(moves.getEndPosition().getRow() == kingPosition.getRow() && moves.getEndPosition().getColumn() == kingPosition.getColumn()){
+                                isInCheck = true;
+                                break;
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+        return isInCheck;
     }
 
     /**
@@ -117,7 +171,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        gameBoard = board;
     }
 
     /**
