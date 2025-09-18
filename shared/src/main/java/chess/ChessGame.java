@@ -61,11 +61,11 @@ public class ChessGame {
                 */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece myPiece = gameBoard.getPiece(startPosition);
+        if(myPiece == null){
+            return null;
+        }
         Collection<ChessMove> validMoves = myPiece.pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> possibleMoves = myPiece.pieceMoves(gameBoard, startPosition);
-//        if(myPiece == null){
-//            return null;
-//        }
         for(ChessMove move : possibleMoves){
             ChessPosition moveStart = move.getStartPosition();
             ChessPosition moveEnd = move.getEndPosition();
@@ -92,7 +92,6 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessBoard boardCopy = new ChessBoard(gameBoard);
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         Collection<ChessMove> moves = validMoves(startPosition);
@@ -101,22 +100,13 @@ public class ChessGame {
         if(startPosition == endPosition || startPiece == null || !moves.contains(move) || startPiece.getTeamColor() != curPlayer){
             throw new InvalidMoveException("Start and end positions are the same");
         }
-        //Makes move
-        if(move.getPromotionPiece() != null){
-            gameBoard.addPiece(endPosition, new ChessPiece(curPlayer, move.getPromotionPiece()));
-        }
-        else{
-            gameBoard.addPiece(endPosition, startPiece);
-        }
-
-        gameBoard.addPiece(startPosition, null);
-        //Checks to see if move will put king in danger
-        if(isInCheck(startPiece.getTeamColor())){
-            gameBoard.addPiece(startPosition, startPiece);
-            gameBoard.addPiece(endPosition, endPiece);
-            throw new InvalidMoveException("Start and end positions are the same");
-        }
-        else{
+            if(move.getPromotionPiece() != null){
+                gameBoard.addPiece(endPosition, new ChessPiece(curPlayer, move.getPromotionPiece()));
+            }
+            else{
+                gameBoard.addPiece(endPosition, startPiece);
+            }
+            gameBoard.addPiece(startPosition, null);
             if(startPiece.getTeamColor() == TeamColor.WHITE){
                 setTeamTurn(TeamColor.BLACK);
             }
@@ -124,7 +114,6 @@ public class ChessGame {
                 setTeamTurn(TeamColor.WHITE);
             }
 
-        }
 
     }
 
