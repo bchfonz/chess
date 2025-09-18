@@ -56,30 +56,33 @@ public class ChessGame {
         How to implement:
         1. Copy the board
         2. Make the move on the copied board
-        3. Check for chekcmate
+        3. Check for checkmate
         4. Update the moves list
                 */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece myPiece = gameBoard.getPiece(startPosition);
-        if(myPiece == null){
-            return null;
-        }
-        else{
-            validMoves = myPiece.pieceMoves(gameBoard, startPosition);
-            return validMoves;
-        }
-//        Collection<ChessMove> possibleMoves = myPiece.pieceMoves(gameBoard, startPosition);
-//        ChessBoard copyBoard = new ChessBoard(gameBoard);
-//        try{
-//            for(ChessMove move : possibleMoves){
-//                makeMove(move);
-//            }
-//        } catch (InvalidMoveException e) {
-////            throw new RuntimeException(e);
+        Collection<ChessMove> validMoves = myPiece.pieceMoves(gameBoard, startPosition);
+        Collection<ChessMove> possibleMoves = myPiece.pieceMoves(gameBoard, startPosition);
+//        if(myPiece == null){
+//            return null;
 //        }
-//
-//        return updatedMoves;
+        for(ChessMove move : possibleMoves){
+            ChessPosition moveStart = move.getStartPosition();
+            ChessPosition moveEnd = move.getEndPosition();
+            ChessPiece startPiece = gameBoard.getPiece(moveStart);
+            ChessPiece endPiece = gameBoard.getPiece(moveEnd);
+            //Simulate making the move
+            gameBoard.addPiece(moveStart, null);
+            gameBoard.addPiece(moveEnd, startPiece);
+            if(isInCheck(myPiece.getTeamColor())){
+                validMoves.remove(move);
+            }
+            //Returns board to the way it was before the move was made
+            gameBoard.addPiece(moveStart, startPiece);
+            gameBoard.addPiece(moveEnd, endPiece);
+        }
+
+        return validMoves;
     }
 
     /**
@@ -98,10 +101,6 @@ public class ChessGame {
         if(startPosition == endPosition || startPiece == null || !moves.contains(move) || startPiece.getTeamColor() != curPlayer){
             throw new InvalidMoveException("Start and end positions are the same");
         }
-//        if(!moves.contains(move)){
-//            throw new InvalidMoveException("Start and end positions are the same");
-//        }
-
         //Makes move
         if(move.getPromotionPiece() != null){
             gameBoard.addPiece(endPosition, new ChessPiece(curPlayer, move.getPromotionPiece()));
