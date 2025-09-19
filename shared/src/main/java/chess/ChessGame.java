@@ -97,8 +97,14 @@ public class ChessGame {
         Collection<ChessMove> moves = validMoves(startPosition);
         ChessPiece startPiece = gameBoard.getPiece(startPosition);
         ChessPiece endPiece = gameBoard.getPiece(endPosition);
-        if(startPosition == endPosition || startPiece == null || !moves.contains(move) || startPiece.getTeamColor() != curPlayer){
-            throw new InvalidMoveException("Start and end positions are the same");
+        if(startPiece == null){
+            throw new InvalidMoveException("Piece is null");
+        }
+        else if(!moves.contains(move)){
+            throw new InvalidMoveException("Attempted move isn't in possible moves");
+        }
+        else if(startPiece.getTeamColor() != curPlayer){
+            throw new InvalidMoveException("Wrong team");
         }
             if(move.getPromotionPiece() != null){
                 gameBoard.addPiece(endPosition, new ChessPiece(curPlayer, move.getPromotionPiece()));
@@ -172,9 +178,35 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        Collection<ChessPiece> teamPieces = new ArrayList<>();
+        boolean checkmate = true;
         if(!isInCheck(teamColor)){
             return false;
         }
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                ChessPosition curPosition = new ChessPosition(i,j);
+                ChessPiece curPiece = gameBoard.getPiece(curPosition);
+                if(curPiece != null && curPiece.getTeamColor() == teamColor){
+                    Collection<ChessMove> pieceMoves = curPiece.pieceMoves(gameBoard, curPosition);
+                    ChessGame copyGame = new ChessGame(this);
+                    for(ChessMove move : pieceMoves){
+                        try{
+                            copyGame.makeMove(move);
+                        } catch (InvalidMoveException e) {
+//                            throw  new RuntimeException(e);
+                        }
+                        if(!copyGame.isInCheck(curPiece.getTeamColor())){
+                            return false;
+                        }
+
+
+                    }
+
+                }
+            }
+        }
+
         /*
         * Check if in check
         * Copy board
@@ -182,8 +214,7 @@ public class ChessGame {
         * If teamColor remains in text through every check, checkmate is true
         * Otherwise checkmate is false
         * */
-
-        throw new RuntimeException("Not implemented");
+        return true;
     }
 
     /**
