@@ -215,53 +215,45 @@ public class ChessGame {
                 ChessPiece curPiece = gameBoard.getPiece(curPosition);
                 if(curPiece != null && curPiece.getTeamColor() == teamColor){
                     Collection<ChessMove> pieceMoves = curPiece.pieceMoves(gameBoard, curPosition);
-                    ChessGame copyGame = new ChessGame(this);
+                    boolean stalemateCheck;
+                    for(ChessMove move : pieceMoves){
+                        ChessGame copyGame = new ChessGame(this);
+                        try{
+                            copyGame.makeMove(move);
+                        } catch (InvalidMoveException e) {
+                            System.out.println(e.toString());
+//                            throw  new RuntimeException(e);
+                        }
+                        if(!copyGame.isInCheck(curPiece.getTeamColor()) && !stalemate){
+                            return false;
+                        }
+                        //Provide logic for checking stalemate depending on if it's a king piece or other pieces
+                        if(stalemate){
+                            if(curPiece.getPieceType() == ChessPiece.PieceType.KING){
+                                if(copyGame.isInCheck(curPiece.getTeamColor())){
+                                    stalemateCheck = true;
+                                }
+                            }
+                            else{
+                                if(!copyGame.isInCheck(curPiece.getTeamColor())){
+                                    stalemateCheck = false;
+                                }
+                            }
+                            return false;
+                        }
+                    }
 
                 }
             }
         }
-        return true;
+        if(stalemate){
+            return stalemateCheck;
+        }
+        else{
+            return true;
+        }
     }
 
-    private boolean checkmateHelper(ChessGame copyGame, Collection<ChessMove> pieceMoves, ChessPiece curPiece){
-        for(ChessMove move : pieceMoves){
-            try{
-                copyGame.makeMove(move);
-            } catch (InvalidMoveException e) {
-//                            throw  new RuntimeException(e);
-            }
-            if(!copyGame.isInCheck(curPiece.getTeamColor())){
-                return false;
-            }
-        }
-        return true;
-    }
-    private boolean stalemateHelper(ChessGame copyGame, Collection<ChessMove> pieceMoves, ChessPiece curPiece){
-        for(ChessMove move : pieceMoves){
-            if(curPiece.getPieceType() == ChessPiece.PieceType.KING){
-                try{
-                    copyGame.makeMove(move);
-                } catch (InvalidMoveException e) {
-//                            throw  new RuntimeException(e);
-                }
-                if(!copyGame.isInCheck(curPiece.getTeamColor())){
-                    return false;
-                }
-            }
-            else{
-                try{
-                    copyGame.makeMove(move);
-                } catch (InvalidMoveException e) {
-//                            throw  new RuntimeException(e);
-                }
-                if(!copyGame.isInCheck(curPiece.getTeamColor())){
-                    return false;
-                }
-            }
-
-        }
-        return true;
-    }
 
     /**
      * Sets this game's chessboard with a given board
