@@ -53,13 +53,6 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    /*
-        How to implement:
-        1. Copy the board
-        2. Make the move on the copied board
-        3. Check for checkmate
-        4. Update the moves list
-                */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece myPiece = gameBoard.getPiece(startPosition);
         if(myPiece == null){
@@ -97,7 +90,6 @@ public class ChessGame {
         ChessPosition endPosition = move.getEndPosition();
         Collection<ChessMove> moves = validMoves(startPosition);
         ChessPiece startPiece = gameBoard.getPiece(startPosition);
-        ChessPiece endPiece = gameBoard.getPiece(endPosition);
         if(startPiece == null){
             throw new InvalidMoveException("Piece is null");
         }
@@ -179,20 +171,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        Collection<ChessPiece> teamPieces = new ArrayList<>();
-        boolean checkmate = true;
         if(!isInCheck(teamColor)){
             return false;
         }
         return stalemateAndCheckmateHelper(teamColor);
 
-        /*
-        * Check if in check
-        * Copy board
-        * Make every move possible for teamColor
-        * If teamColor remains in text through every check, checkmate is true
-        * Otherwise checkmate is false
-        * */
     }
 
     /**
@@ -208,7 +191,6 @@ public class ChessGame {
         }
         return stalemateAndCheckmateHelper(teamColor);
     }
-
     private boolean stalemateAndCheckmateHelper(TeamColor teamColor){
         for(int i = 1; i <= 8; i++){
             for(int j = 1; j <= 8; j++){
@@ -220,23 +202,6 @@ public class ChessGame {
                     if(pieceMoves != null && !pieceMoves.isEmpty()){
                         return false;
                     }
-//                    for(ChessMove move : pieceMoves){
-//                        if(curPiece.getTeamColor() == TeamColor.WHITE && curPiece.getPieceType() == ChessPiece.PieceType.KING){
-//                            System.out.println(move);
-//                        }
-//                        try{
-//                            copyGame.makeMove(move);
-//                            copyGame.setTeamTurn(teamColor);
-//                        } catch (InvalidMoveException e) {
-////                            continue;
-//
-////                            throw  new RuntimeException(e);
-//                        }
-//                        if(!copyGame.isInCheck(teamColor)){
-//                            return false;
-//                        }
-//                    }
-
                 }
             }
         }
