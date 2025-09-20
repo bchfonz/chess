@@ -183,7 +183,7 @@ public class ChessGame {
         if(!isInCheck(teamColor)){
             return false;
         }
-        return stalemateAndCheckmateHelper(teamColor, false);
+        return stalemateAndCheckmateHelper(teamColor);
 
         /*
         * Check if in check
@@ -205,53 +205,41 @@ public class ChessGame {
         if(isInCheck(teamColor)){
             return false;
         }
-        return stalemateAndCheckmateHelper(teamColor, true);
+        return stalemateAndCheckmateHelper(teamColor);
     }
 
-    private boolean stalemateAndCheckmateHelper(TeamColor teamColor, boolean stalemate){
+    private boolean stalemateAndCheckmateHelper(TeamColor teamColor){
         for(int i = 1; i <= 8; i++){
             for(int j = 1; j <= 8; j++){
                 ChessPosition curPosition = new ChessPosition(i,j);
                 ChessPiece curPiece = gameBoard.getPiece(curPosition);
                 if(curPiece != null && curPiece.getTeamColor() == teamColor){
-                    Collection<ChessMove> pieceMoves = curPiece.pieceMoves(gameBoard, curPosition);
-                    boolean stalemateCheck;
-                    for(ChessMove move : pieceMoves){
-                        ChessGame copyGame = new ChessGame(this);
-                        try{
-                            copyGame.makeMove(move);
-                        } catch (InvalidMoveException e) {
-                            System.out.println(e.toString());
-//                            throw  new RuntimeException(e);
-                        }
-                        if(!copyGame.isInCheck(curPiece.getTeamColor()) && !stalemate){
-                            return false;
-                        }
-                        //Provide logic for checking stalemate depending on if it's a king piece or other pieces
-                        if(stalemate){
-                            if(curPiece.getPieceType() == ChessPiece.PieceType.KING){
-                                if(copyGame.isInCheck(curPiece.getTeamColor())){
-                                    stalemateCheck = true;
-                                }
-                            }
-                            else{
-                                if(!copyGame.isInCheck(curPiece.getTeamColor())){
-                                    stalemateCheck = false;
-                                }
-                            }
-                            return false;
-                        }
+                    ChessGame copyGame = new ChessGame(this);
+                    Collection<ChessMove> pieceMoves = validMoves(curPosition);
+                    if(pieceMoves != null && !pieceMoves.isEmpty()){
+                        return false;
                     }
+//                    for(ChessMove move : pieceMoves){
+//                        if(curPiece.getTeamColor() == TeamColor.WHITE && curPiece.getPieceType() == ChessPiece.PieceType.KING){
+//                            System.out.println(move);
+//                        }
+//                        try{
+//                            copyGame.makeMove(move);
+//                            copyGame.setTeamTurn(teamColor);
+//                        } catch (InvalidMoveException e) {
+////                            continue;
+//
+////                            throw  new RuntimeException(e);
+//                        }
+//                        if(!copyGame.isInCheck(teamColor)){
+//                            return false;
+//                        }
+//                    }
 
                 }
             }
         }
-        if(stalemate){
-            return stalemateCheck;
-        }
-        else{
-            return true;
-        }
+        return true;
     }
 
 
