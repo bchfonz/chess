@@ -34,6 +34,7 @@ Handler -> Service: login(LoginRequest)
 Service -> DataAccess: getUser(username)
 DataAccess -> db: Find UserData by username
 DataAccess --> Service: UserData
+Service->Service: validatePassword(password)
 Service -> DataAccess:createAuth(authData)
 DataAccess -> db:Add AuthData
 Service --> Handler: RegisterResult
@@ -50,8 +51,8 @@ DataAccess->db: Find AuthData by authToken
 DataAccess-->Service: AuthData
 Service->DataAccess:deleteAuth(authToken)
 DataAccess->db: Delete AuthData by authToken
-Service-->Handler: Logout Result
-Handler-->Server:authToken
+Service-->Handler: LogoutResult
+Handler-->Server:{}
 Server-->Client:200\n{}
 end
 
@@ -59,8 +60,11 @@ group#red #pink List Games
 Client -> Server: [GET] /game\nauthToken
 Server->Handler: authToken
 Handler->Service:listGames(ListGamesRequest)
-Service->DataAccess: listGames(authToken)
-DataAccess->db: Find GameList by authToken
+Service->DataAccess: getAuth(authToken)
+DataAccess->db: Find AuthData by authToken
+DataAccess-->Service: AuthData
+Service->DataAccess: listGames()
+DataAccess->db: Select * from games\nStore in GameList (= Collection<gameData>)\n
 DataAccess-->Service: GameList
 Service-->Handler: ListGamesResult
 Handler-->Server:{ "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
@@ -91,10 +95,11 @@ DataAccess->db: Find AuthData by authToken
 DataAccess-->Service: AuthData
 Service->DataAccess:getGame(gameID)
 DataAccess->db: Find GameData by gameID
-DataAccess-->Service: gameData
-Service->DataAccess:updateGame(playerColor, GameData)
+DataAccess-->Service: GameData
+Service->Service:isColorTaken(playerColor, GameData)
+Service->DataAccess:updateGame(playerColor, AuthData.username, GameData)
 DataAccess->db: Update GameData by gameID
-Service-->Handler: JoinGameResutl
+Service-->Handler: JoinGameResult
 Handler-->Server:{}
 Server-->Client:200\n{}
 end
@@ -103,9 +108,16 @@ group#gray #lightgray Clear application
 Client -> Server: [DELETE] /db
 Server->Handler: {}
 Handler->Service:clearData(ClearDataRequest)
-Service->DataAccess: clear()
-DataAccess->db: Clear All Data\n
+Service->DataAccess: clearAuth()
+DataAccess->db: Clear All AuthData in Auth DataBase
 DataAccess --> Service: {}
+Service->DataAccess: clearGames()
+DataAccess->db: Clear All GameData in Game DataBase
+DataAccess --> Service:{}
+
+Service->DataAccess: clearUsers()
+DataAccess->db: Clear All UserData in User DataBase
+DataAccess --> Service:{}
 Service-->Handler: ClearDataResult
 Handler-->Server:{}
 Server-->Client:200\n{}
