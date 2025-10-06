@@ -69,7 +69,7 @@ end
 
 group#d790e0 #E3CCE6 Create Game 
 Client -> Server: [POST] /game\nauthToken\n{gameName}
-Server->Handler: authToken { "gameName":"" }
+Server->Handler: authToken \n{ "gameName":" "}
 Handler->Service:createGame(CreateGameRequest)
 Service->DataAccess:getAuth(authToken)
 DataAccess->db: Find AuthData by authToken
@@ -84,29 +84,29 @@ end
 
 group#yellow #lightyellow Join Game #black
 Client -> Server: [PUT] /game\nauthToken\n{playerColor, gameID}
-Server->Handler: 
-Handler->Service:
-Service->DataAccess: 
-DataAccess->db: 
-DataAccess-->Service: 
-Service->DataAccess:
-DataAccess->db: 
-Service-->Handler: 
-Handler-->Server:
+Server->Handler: authToken \n{ "playerColor":" ", "gameID":" "}
+Handler->Service:joinGame(JoinGameRequest)
+Service->DataAccess: getAuth(authToken)
+DataAccess->db: Find AuthData by authToken
+DataAccess-->Service: AuthData
+Service->DataAccess:getGame(gameID)
+DataAccess->db: Find GameData by gameID
+DataAccess-->Service: gameData
+Service->DataAccess:updateGame(playerColor, GameData)
+DataAccess->db: Update GameData by gameID
+Service-->Handler: JoinGameResutl
+Handler-->Server:{}
 Server-->Client:200\n{}
 end
 
 group#gray #lightgray Clear application 
 Client -> Server: [DELETE] /db
-Server->Handler: 
-Handler->Service:
-Service->DataAccess: 
-DataAccess->db: 
-DataAccess-->Service: 
-Service->DataAccess:
-DataAccess->db: 
-Service-->Handler: 
-Handler-->Server:
+Server->Handler: {}
+Handler->Service:clearData(ClearDataRequest)
+Service->DataAccess: clear()
+DataAccess->db: Clear All Data\n
+DataAccess --> Service: {}
+Service-->Handler: ClearDataResult
+Handler-->Server:{}
 Server-->Client:200\n{}
 end
-
