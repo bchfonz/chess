@@ -10,7 +10,6 @@ import java.util.UUID;
 public class UserService {
     private final localUserDB userDAO = new localUserDB();
     private final localAuthDB authDAO = new localAuthDB();
-//    I need to add access to the Auth Database to update that when a new user is registered
 
     public static String generateToken() {
         return UUID.randomUUID().toString();

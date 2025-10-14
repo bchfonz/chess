@@ -23,16 +23,12 @@ public class RegisterHandler implements Handler {
         if(user.username() == null || user.password() == null || user.email() == null){
             System.out.println("In bad requests");
             ctx.status(400);
-            String badRequest = "Error: bad request";
-
             ctx.json(gson.toJson(Map.of("message", "Error: bad request")));
         }
         else if(result == null){
             System.out.println("In username already taken");
             ctx.status(403);
-            String errorMessage = "Error: username already taken";
             ctx.json(gson.toJson(Map.of("message", "Error: username already taken")));
-//            ctx.result(gson.toJson(errorMessage));
         }
         else{
             ctx.status(200);
@@ -40,11 +36,6 @@ public class RegisterHandler implements Handler {
             System.out.println("Response: " + ctx.status());
 
             ctx.result(gson.toJson(result));
-//            ctx.json(result);
         }
     }
-    public void serializeReg(){
-        var serializer = new Gson();
-    }
-
 }
