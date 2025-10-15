@@ -3,7 +3,10 @@ package service;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.xml.crypto.Data;
 
 public class UserServiceTest {
 
@@ -12,6 +15,10 @@ public class UserServiceTest {
     @BeforeAll
     public static void createUserService() throws DataAccessException {
         userService = new UserService();
+    }
+    @BeforeEach
+    public void createUser(){
+        userService.register(new RegisterRequest("username", "password", "email"));
     }
 
     @Test
@@ -25,12 +32,21 @@ public class UserServiceTest {
 
     @Test
     public void duplicateRegister () throws DataAccessException{
-        RegisterRequest newRegRequest = new RegisterRequest("Benji", "password", "benji@swagg.com");
-        RegisterRequest duplicateRegRequest = new RegisterRequest("Benji", "newPassword", "benjipups@swagg.com");
-        userService.register(newRegRequest);
+        RegisterRequest duplicateRegRequest = new RegisterRequest("username", "newPassword", "benjipups@swagg.com");
         RegAndLoginResult duplicateRegResult = userService.register(duplicateRegRequest);
         Assertions.assertNull(duplicateRegResult, "Shouldn't allow duplicate registration");
 
     }
 
+    @Test
+    public void successfulLogin() throws DataAccessException{
+        LoginRequest newLoginRequest = new LoginRequest("username", "password");
+        Assertions.assertNotNull(userService.login(newLoginRequest));
+    }
+
+    @Test
+    public void invalidLogin() throws DataAccessException{
+        LoginRequest newLoginRequest = new LoginRequest("username", "wrongPassword");
+        Assertions.assertNull(userService.login(newLoginRequest));
+    }
 }
