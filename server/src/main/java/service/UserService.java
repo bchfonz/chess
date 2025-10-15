@@ -5,6 +5,8 @@ import model.AuthData;
 import model.UserData;
 
 import io.javalin.http.Context;
+
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
@@ -33,7 +35,27 @@ public class UserService {
 
     }
     public RegAndLoginResult login(LoginRequest loginRequest) {
-        return null;
+        try {
+            System.out.println("Number of users when trying to login: "+ userDAO.numUsers());
+            System.out.println("Number of auth when trying to login: "+ authDAO.numAuth());
+            String username = loginRequest.username();
+            String password = loginRequest.password();
+            UserData userData = userDAO.getUser(username);
+            RegAndLoginResult loginResult;
+            if(userData == null){
+                return null;
+            }
+            else if (Objects.equals(userData.password(), password)) {
+                AuthData loginAuth = new AuthData(generateToken(), username);
+                authDAO.addAuth(loginAuth);
+                loginResult = new RegAndLoginResult(username, loginAuth.authToken());
+                return loginResult;
+            } else {
+                return null;
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
     public void logout(LogoutRequest logoutRequest) {}
 }

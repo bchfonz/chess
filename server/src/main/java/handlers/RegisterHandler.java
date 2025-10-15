@@ -13,7 +13,10 @@ import java.util.Map;
 public class RegisterHandler implements Handler {
 
     private final Gson gson = new Gson();
-    private final UserService userServiceObj = new UserService();
+    private final UserService userServiceObj;
+    public RegisterHandler(UserService userServiceObj){
+        this.userServiceObj = userServiceObj;
+    }
     @Override
     public void handle(Context ctx) {
         // Example: read JSON and respond

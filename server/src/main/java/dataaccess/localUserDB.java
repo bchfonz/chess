@@ -27,4 +27,8 @@ public class localUserDB implements UserDAO{
     public boolean emptyDB(){
         return userDB.isEmpty();
     }
+
+    public int numUsers(){
+        return userDB.size();
+    }
 }

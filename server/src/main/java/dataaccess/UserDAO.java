@@ -9,4 +9,5 @@ public interface UserDAO {
     public void deleteUser(String username);
     public void clearUserDB();
     public boolean emptyDB();
+    public int numUsers();
 }

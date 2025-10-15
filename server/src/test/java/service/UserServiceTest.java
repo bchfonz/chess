@@ -27,9 +27,9 @@ public class UserServiceTest {
     public void duplicateRegister () throws DataAccessException{
         RegisterRequest newRegRequest = new RegisterRequest("Benji", "password", "benji@swagg.com");
         RegisterRequest duplicateRegRequest = new RegisterRequest("Benji", "newPassword", "benjipups@swagg.com");
-        RegAndLoginResult newRegResult = userService.register(newRegRequest);
+        userService.register(newRegRequest);
         RegAndLoginResult duplicateRegResult = userService.register(duplicateRegRequest);
-        Assertions.assertNull(newRegResult, "Shouldn't allow duplicate registration");
+        Assertions.assertNull(duplicateRegResult, "Shouldn't allow duplicate registration");
 
     }
 

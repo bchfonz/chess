@@ -8,4 +8,5 @@ public interface AuthDAO {
     public void deleteAuth(String authToken);
     public void clearAuthDB();
     public boolean emptyDB();
+    public int numAuth();
 }

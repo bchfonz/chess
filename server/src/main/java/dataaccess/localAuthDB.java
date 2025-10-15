@@ -26,4 +26,8 @@ public class localAuthDB implements AuthDAO{
     public boolean emptyDB(){
         return authDB.isEmpty();
     }
+
+    public int numAuth(){
+        return authDB.size();
+    }
 }
