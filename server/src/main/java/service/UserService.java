@@ -57,5 +57,13 @@ public class UserService {
             throw new RuntimeException(e);
         }
     }
-    public void logout(LogoutRequest logoutRequest) {}
+    public boolean logout(LogoutRequest logoutRequest) {
+        if(authDAO.getAuth(logoutRequest.authToken()) == null){
+            return false;
+        }
+        else{
+            authDAO.deleteAuth(logoutRequest.authToken());
+            return true;
+        }
+    }
 }
