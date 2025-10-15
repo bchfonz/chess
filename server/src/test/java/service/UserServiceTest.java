@@ -11,6 +11,7 @@ import javax.xml.crypto.Data;
 public class UserServiceTest {
 
     private static UserService userService;
+    private static String usernameAuthToken;
 
     @BeforeAll
     public static void createUserService() throws DataAccessException {
@@ -18,7 +19,8 @@ public class UserServiceTest {
     }
     @BeforeEach
     public void createUser(){
-        userService.register(new RegisterRequest("username", "password", "email"));
+        RegAndLoginResult newUser =  userService.register(new RegisterRequest("username", "password", "email"));
+        usernameAuthToken = newUser.authToken();
     }
 
     @Test
@@ -48,5 +50,17 @@ public class UserServiceTest {
     public void invalidLogin() throws DataAccessException{
         LoginRequest newLoginRequest = new LoginRequest("username", "wrongPassword");
         Assertions.assertNull(userService.login(newLoginRequest));
+    }
+
+    @Test
+    public void successfulLogout() throws DataAccessException{
+        LogoutRequest newLogout = new LogoutRequest(usernameAuthToken);
+        Assertions.assertTrue(userService.logout(newLogout));
+    }
+
+    @Test
+    public void invalidLogout() throws DataAccessException{
+        LogoutRequest newLogout = new LogoutRequest("Not an authToken");
+        Assertions.assertFalse(userService.logout(newLogout));
     }
 }
