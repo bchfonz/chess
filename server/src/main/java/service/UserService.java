@@ -58,12 +58,19 @@ public class UserService {
         }
     }
     public boolean logout(LogoutRequest logoutRequest) {
-        if(authDAO.getAuth(logoutRequest.authToken()) == null){
-            return false;
+        try{
+            if(authDAO.getAuth(logoutRequest.authToken()) == null){
+                System.out.println("AuthToken didn't exist");
+                return false;
+            }
+            else{
+                System.out.println("Authoken was found. Deleting now");
+                authDAO.deleteAuth(logoutRequest.authToken());
+                return true;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        else{
-            authDAO.deleteAuth(logoutRequest.authToken());
-            return true;
-        }
+
     }
 }

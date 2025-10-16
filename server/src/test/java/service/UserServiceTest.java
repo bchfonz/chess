@@ -24,7 +24,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void successfulNewRegister () throws DataAccessException{
+    public void successfulNewRegister (){
         RegisterRequest newRegRequest = new RegisterRequest("Benji", "password", "benji@swagg.com");
         RegAndLoginResult registerResult = userService.register(newRegRequest);
         Assertions.assertNotNull(registerResult, "User already exists");
@@ -33,7 +33,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void duplicateRegister () throws DataAccessException{
+    public void duplicateRegister (){
         RegisterRequest duplicateRegRequest = new RegisterRequest("username", "newPassword", "benjipups@swagg.com");
         RegAndLoginResult duplicateRegResult = userService.register(duplicateRegRequest);
         Assertions.assertNull(duplicateRegResult, "Shouldn't allow duplicate registration");
@@ -41,25 +41,25 @@ public class UserServiceTest {
     }
 
     @Test
-    public void successfulLogin() throws DataAccessException{
+    public void successfulLogin(){
         LoginRequest newLoginRequest = new LoginRequest("username", "password");
         Assertions.assertNotNull(userService.login(newLoginRequest));
     }
 
     @Test
-    public void invalidLogin() throws DataAccessException{
+    public void invalidLogin(){
         LoginRequest newLoginRequest = new LoginRequest("username", "wrongPassword");
         Assertions.assertNull(userService.login(newLoginRequest));
     }
 
     @Test
-    public void successfulLogout() throws DataAccessException{
+    public void successfulLogout(){
         LogoutRequest newLogout = new LogoutRequest(usernameAuthToken);
         Assertions.assertTrue(userService.logout(newLogout));
     }
 
     @Test
-    public void invalidLogout() throws DataAccessException{
+    public void invalidLogout(){
         LogoutRequest newLogout = new LogoutRequest("Not an authToken");
         Assertions.assertFalse(userService.logout(newLogout));
     }

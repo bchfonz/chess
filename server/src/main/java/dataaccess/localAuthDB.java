@@ -10,16 +10,16 @@ public class localAuthDB implements AuthDAO{
         authDB.put(newAuth.authToken(), newAuth);
     }
 
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException{
         return authDB.get(authToken);
     }
 
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DataAccessException{
         authDB.remove(authToken);
     }
 
     @Override
-    public void clearAuthDB() {
+    public void clearAuthDB() throws DataAccessException{
         authDB.clear();
     }
 
