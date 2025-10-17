@@ -10,8 +10,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
-    private final localUserDB userDAO = new localUserDB();
-    private final localAuthDB authDAO = new localAuthDB();
+    public final localUserDB userDAO = new localUserDB();
+    public final localAuthDB authDAO = new localAuthDB();
 
     public static String generateToken() {
         return UUID.randomUUID().toString();
