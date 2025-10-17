@@ -17,6 +17,10 @@ public class localGameDB implements GameDAO{
     public int numOfGames(){
         return gameDB.size();
     }
+
+    public HashMap<Integer, GameData> getGamesList(){
+        return gameDB;
+    }
     @Override
     public void clearGameDB() {
         gameDB.clear();

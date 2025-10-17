@@ -19,7 +19,7 @@ public class Server {
         javalin.post("/user", new RegisterHandler(userServiceObj));
         javalin.post("/session", new LoginHandler(userServiceObj));
         javalin.delete("/session", new LogoutHandler(userServiceObj));
-        javalin.get("/game", new ListGamesHandler(gameServiceObj));
+        javalin.get("/game", new ListGamesHandler(gameServiceObj, userServiceObj));
         javalin.post("/game", new CreateGameHandler(gameServiceObj, userServiceObj));
         javalin.put("/game", new JoinGameHandler(gameServiceObj));
 
