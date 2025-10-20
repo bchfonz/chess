@@ -18,6 +18,11 @@ public class localGameDB implements GameDAO{
         return gameDB.size();
     }
 
+    public void updateGame(int gameID, GameData updatedGamed){
+        gameDB.remove(gameID);
+        gameDB.put(gameID, updatedGamed);
+    }
+
     public HashMap<Integer, GameData> getGamesList(){
         return gameDB;
     }

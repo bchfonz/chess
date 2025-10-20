@@ -15,13 +15,13 @@ public class Server {
         UserService userServiceObj = new UserService();
         GameService gameServiceObj = new GameService();
         // Register your endpoints and exception handlers here.
-        javalin.delete("/db", new ClearHandler());
+        javalin.delete("/db", new ClearHandler(userServiceObj, gameServiceObj));
         javalin.post("/user", new RegisterHandler(userServiceObj));
         javalin.post("/session", new LoginHandler(userServiceObj));
         javalin.delete("/session", new LogoutHandler(userServiceObj));
         javalin.get("/game", new ListGamesHandler(gameServiceObj, userServiceObj));
         javalin.post("/game", new CreateGameHandler(gameServiceObj, userServiceObj));
-        javalin.put("/game", new JoinGameHandler(gameServiceObj));
+        javalin.put("/game", new JoinGameHandler(gameServiceObj, userServiceObj));
 
 
 
