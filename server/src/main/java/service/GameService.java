@@ -11,7 +11,7 @@ public class GameService {
     //If I move the local db to the service classes I might be able to keep persistance for local db
     //I'd probably have to pass in the db as an argument in all of these functions though. Or maybe
     //put in a constructor...
-    private final localGameDB gameDAO = new localGameDB();
+    public final localGameDB gameDAO = new localGameDB();
 
     public int createGame(CreateGameRequest createGameRequest){
         int gameID = gameDAO.numOfGames() + 1;
@@ -29,12 +29,12 @@ public class GameService {
             int curGameID = game.getValue().gameID();
             String curWhiteUsername = game.getValue().whiteUsername();
             String curBlackUsername = game.getValue().blackUsername();
-            if(curWhiteUsername == null){
-                curWhiteUsername = "null";
-            }
-            if(curBlackUsername == null){
-                curBlackUsername = "null";
-            }
+//            if(curWhiteUsername == null){
+//                curWhiteUsername = "null";
+//            }
+//            if(curBlackUsername == null){
+//                curBlackUsername = "null";
+//            }
             String curGameName = game.getValue().gameName();
             ListGamesResult listGamesResult = new ListGamesResult(curGameID, curWhiteUsername, curBlackUsername, curGameName);
             listGamesResults.add(listGamesResult);

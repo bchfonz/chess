@@ -9,13 +9,17 @@ import service.UserService;
 
 public class ClearHandler implements Handler {
     private final ClearService clearServiceObj = new ClearService();
+    private final UserService userServiceObj;
+    private final GameService gameServiceObj;
 
     public ClearHandler(UserService userServiceObj, GameService gameServiceObj) {
+        this.userServiceObj = userServiceObj;
+        this.gameServiceObj = gameServiceObj;
     }
 
     @Override
     public void handle(Context ctx){
-        clearServiceObj.clearAllDB();
+        clearServiceObj.clearAllDB(userServiceObj, gameServiceObj);
         if(clearServiceObj.isCleared()){
             ctx.status(200);
         }

@@ -33,7 +33,7 @@ public class JoinGameHandler implements Handler {
                 ctx.status(401);
                 ctx.json(gson.toJson(Map.of("message", "Error: unauthorized")));
             }
-            else if(joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0){
+            else if(joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 || (!joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK"))){
                 ctx.status(400);
                 ctx.json(gson.toJson(Map.of("message", "Error: bad request")));
             }
