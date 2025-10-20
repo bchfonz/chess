@@ -149,7 +149,8 @@ public class ChessGame {
                     if(curPiece.getTeamColor() != team){
                         Collection<ChessMove> enemyMoves = curPiece.pieceMoves(gameBoard, curPosition);
                         for(ChessMove moves : enemyMoves){
-                            if(moves.getEndPosition().getRow() == kingPosition.getRow() && moves.getEndPosition().getColumn() == kingPosition.getColumn()){
+                            if(moves.getEndPosition().getRow() == kingPosition.getRow() &&
+                                    moves.getEndPosition().getColumn() == kingPosition.getColumn()){
                                 isInCheck = true;
                                 break;
                             }
