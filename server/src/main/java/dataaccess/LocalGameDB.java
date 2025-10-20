@@ -4,7 +4,7 @@ import model.GameData;
 
 import java.util.HashMap;
 
-public class localGameDB implements GameDAO{
+public class LocalGameDB implements GameDAO{
     private final HashMap<Integer, GameData> gameDB = new HashMap<>();
     public void addGame(GameData newGame){
         gameDB.put(newGame.gameID(), newGame);

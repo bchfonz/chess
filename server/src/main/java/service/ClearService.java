@@ -3,9 +3,9 @@ package service;
 import dataaccess.*;
 
 public class ClearService {
-    private final localUserDB userDAO = new localUserDB();
-    private final localAuthDB authDAO = new localAuthDB();
-    private final localGameDB gameDAO = new localGameDB();
+    private final LocalUserDB userDAO = new LocalUserDB();
+    private final LocalAuthDB authDAO = new LocalAuthDB();
+    private final LocalGameDB gameDAO = new LocalGameDB();
     public void clearAllDB(UserService userServiceObj, GameService gameServiceObj) {
         try{
             userServiceObj.authDAO.clearAuthDB();

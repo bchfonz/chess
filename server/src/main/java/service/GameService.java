@@ -1,8 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.localGameDB;
+import dataaccess.LocalGameDB;
 import model.GameData;
 
 import java.util.*;
@@ -11,7 +10,7 @@ public class GameService {
     //If I move the local db to the service classes I might be able to keep persistance for local db
     //I'd probably have to pass in the db as an argument in all of these functions though. Or maybe
     //put in a constructor...
-    public final localGameDB gameDAO = new localGameDB();
+    public final LocalGameDB gameDAO = new LocalGameDB();
 
     public int createGame(CreateGameRequest createGameRequest){
         int gameID = gameDAO.numOfGames() + 1;

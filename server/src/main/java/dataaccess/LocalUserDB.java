@@ -4,7 +4,7 @@ import model.UserData;
 
 import java.util.HashMap;
 
-public class localUserDB implements UserDAO{
+public class LocalUserDB implements UserDAO{
     private final HashMap<String, UserData> userDB = new HashMap<>();
     public UserData getUser(String username) throws DataAccessException {
         return userDB.get(username);

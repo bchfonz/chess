@@ -4,14 +4,12 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
-import io.javalin.http.Context;
-
 import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
-    public final localUserDB userDAO = new localUserDB();
-    public final localAuthDB authDAO = new localAuthDB();
+    public final LocalUserDB userDAO = new LocalUserDB();
+    public final LocalAuthDB authDAO = new LocalAuthDB();
 
     public static String generateToken() {
         return UUID.randomUUID().toString();

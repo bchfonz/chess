@@ -4,7 +4,7 @@ import model.AuthData;
 
 import java.util.HashMap;
 
-public class localAuthDB implements AuthDAO{
+public class LocalAuthDB implements AuthDAO{
     private final HashMap<String, AuthData> authDB = new HashMap<>();
     public void addAuth(AuthData newAuth) {
         authDB.put(newAuth.authToken(), newAuth);
