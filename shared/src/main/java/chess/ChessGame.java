@@ -139,16 +139,20 @@ public class ChessGame {
         return isInCheckHelper(kingPosition, teamColor);
 
     }
-    private boolean isInCheckHelper(ChessPosition kingPosition, TeamColor team){
+    private boolean isInCheckHelper(ChessPosition kingPosition, TeamColor team) {
         boolean isInCheck = false;
-        for(int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                ChessPosition curPosition = new ChessPosition(i,j);
+                ChessPosition curPosition = new ChessPosition(i, j);
                 ChessPiece curPiece = gameBoard.getPiece(curPosition);
-                if(curPiece == null) continue;
-                if(curPiece.getTeamColor() == team) continue;
+                if (curPiece == null) {
+                    continue;
+                }
+                if (curPiece.getTeamColor() == team) {
+                    continue;
+                }
                 Collection<ChessMove> enemyMoves = curPiece.pieceMoves(gameBoard, curPosition);
-                for(ChessMove moves : enemyMoves) {
+                for (ChessMove moves : enemyMoves) {
                     if (moves.getEndPosition().getRow() == kingPosition.getRow() &&
                             moves.getEndPosition().getColumn() == kingPosition.getColumn()) {
                         isInCheck = true;
@@ -159,29 +163,6 @@ public class ChessGame {
         }
 
         return isInCheck;
-//        boolean isInCheck = false;
-//        for(int i = 1; i <= 8; i++) {
-//            for (int j = 1; j <= 8; j++) {
-//                ChessPosition curPosition = new ChessPosition(i,j);
-//                ChessPiece curPiece = gameBoard.getPiece(curPosition);
-//                if(curPiece != null){
-//                    if(curPiece.getTeamColor() != team){
-//                        Collection<ChessMove> enemyMoves = curPiece.pieceMoves(gameBoard, curPosition);
-//                        for(ChessMove moves : enemyMoves){
-//                            if(moves.getEndPosition().getRow() == kingPosition.getRow() &&
-//                                    moves.getEndPosition().getColumn() == kingPosition.getColumn()){
-//                                isInCheck = true;
-//                                break;
-//                            }
-//                        }
-//
-//                    }
-//                }
-//
-//            }
-//        }
-//
-//        return isInCheck;
     }
 
     /**

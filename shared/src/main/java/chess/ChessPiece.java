@@ -192,36 +192,32 @@ public class ChessPiece {
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
                 ChessPiece curPiece = board.getPiece(curPosition);
                 if(curCol == myPosition.getColumn() && curPiece == null){
-                    if(curRow != 8 && curRow != 1){
-                        validMoves.add(new ChessMove(myPosition, curPosition, null));
-                    }
-                    else{
-                        validMoves.add(new ChessMove(myPosition, curPosition, PieceType.BISHOP));
-                        validMoves.add(new ChessMove(myPosition, curPosition, PieceType.KNIGHT));
-                        validMoves.add(new ChessMove(myPosition, curPosition, PieceType.ROOK));
-                        validMoves.add(new ChessMove(myPosition, curPosition, PieceType.QUEEN));
-                    }
+                    pawnMoveHelper(myPosition, validMoves, curRow, curPosition);
                 }
                 else if(curCol == myPosition.getColumn() && curPiece != null){
                     break;
                 }
                 else if(curCol != myPosition.getColumn() && curPiece != null){
-                    if(myPiece.pieceColor != curPiece.pieceColor){
-                        if(curRow != 8 && curRow != 1){
-                            validMoves.add(new ChessMove(myPosition, curPosition, null));
-                        }
-                        else{
-                            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.BISHOP));
-                            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.KNIGHT));
-                            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.ROOK));
-                            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.QUEEN));
-                        }
+                    if(myPiece.pieceColor == curPiece.pieceColor){
+                        continue;
                     }
-
+                    pawnMoveHelper(myPosition, validMoves, curRow, curPosition);
                 }
             }
         }
         return validMoves;
+    }
+
+    private void pawnMoveHelper(ChessPosition myPosition, Collection<ChessMove> validMoves, int curRow, ChessPosition curPosition) {
+        if(curRow != 8 && curRow != 1){
+            validMoves.add(new ChessMove(myPosition, curPosition, null));
+        }
+        else{
+            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.BISHOP));
+            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.KNIGHT));
+            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.ROOK));
+            validMoves.add(new ChessMove(myPosition, curPosition, PieceType.QUEEN));
+        }
     }
 
     private Collection<ChessMove> allOtherMoves(ChessBoard board, ChessPosition myPosition, int[][] directions){
