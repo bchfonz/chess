@@ -46,21 +46,8 @@ public class CreateGameHandler implements Handler {
                 ctx.status(200);
                 ctx.json(gson.toJson(Map.of("gameID", gameID)));
             }
-
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
-//        if(userServiceObj.authDAO.getAuth(authToken) == null){
-//
-//        }
-//        else{
-//            CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
-//        }
-
-
-
     }
 }

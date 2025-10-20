@@ -89,7 +89,6 @@ public class ChessPiece {
                     {0,1},
                     {0,-1}
             };
-
         }
         else if(piece.type == PieceType.PAWN){
             //I need to account for capturing a piece
@@ -127,8 +126,6 @@ public class ChessPiece {
                     };
                 }
             }
-
-
         }
         else if(piece.type == PieceType.QUEEN || piece.type == PieceType.KING){
             directions =  new int[][]{
@@ -141,7 +138,6 @@ public class ChessPiece {
                     {0,1},
                     {0,-1}
             };
-
         }
         else{
             directions = new int[][]{
@@ -157,7 +153,6 @@ public class ChessPiece {
         else if(piece.type == PieceType.PAWN){
             return pawnMoves(board, myPosition, directions);
         }
-
         return List.of();
     }
 

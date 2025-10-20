@@ -14,12 +14,6 @@ public class localUserDB implements UserDAO{
         userDB.put(newUser.username(), newUser);
     }
 
-    @Override
-    public void deleteUser(String username) {
-        userDB.remove(username);
-    }
-
-    @Override
     public void clearUserDB() {
         userDB.clear();
     }

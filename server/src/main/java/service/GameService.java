@@ -29,12 +29,6 @@ public class GameService {
             int curGameID = game.getValue().gameID();
             String curWhiteUsername = game.getValue().whiteUsername();
             String curBlackUsername = game.getValue().blackUsername();
-//            if(curWhiteUsername == null){
-//                curWhiteUsername = "null";
-//            }
-//            if(curBlackUsername == null){
-//                curBlackUsername = "null";
-//            }
             String curGameName = game.getValue().gameName();
             ListGamesResult listGamesResult = new ListGamesResult(curGameID, curWhiteUsername, curBlackUsername, curGameName);
             listGamesResults.add(listGamesResult);
