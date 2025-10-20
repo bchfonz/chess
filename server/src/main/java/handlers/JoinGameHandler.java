@@ -29,7 +29,6 @@ public class JoinGameHandler implements Handler {
         AuthData authData = userServiceObj.authDAO.getAuth(authToken);
         try{
             if(authData == null){
-                System.out.println("Authdata: " + userServiceObj.authDAO.getAuth(authToken));
                 ctx.status(401);
                 ctx.json(gson.toJson(Map.of("message", "Error: unauthorized")));
             }

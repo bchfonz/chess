@@ -36,7 +36,6 @@ public class CreateGameHandler implements Handler {
                 ctx.json(gson.toJson(Map.of("message", "Error: bad request")));
             }
             else if(userServiceObj.authDAO.getAuth(authToken) == null){
-                System.out.println("Authdata: " + userServiceObj.authDAO.getAuth(authToken));
                 ctx.status(401);
                 ctx.json(gson.toJson(Map.of("message", "Error: unauthorized")));
             }

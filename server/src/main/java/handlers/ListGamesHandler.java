@@ -27,7 +27,6 @@ public class ListGamesHandler implements Handler {
         String authToken = ctx.header("authorization");
         try{
             if(userServiceObj.authDAO.getAuth(authToken) == null){
-                System.out.println("Authdata: " + userServiceObj.authDAO.getAuth(authToken));
                 ctx.status(401);
                 ctx.json(gson.toJson(Map.of("message", "Error: unauthorized")));
             }
