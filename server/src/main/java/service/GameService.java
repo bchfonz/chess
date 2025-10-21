@@ -13,6 +13,9 @@ public class GameService {
     public final LocalGameDB gameDAO = new LocalGameDB();
 
     public int createGame(CreateGameRequest createGameRequest){
+        if(createGameRequest.gameName() == null){
+            return 0;
+        }
         int gameID = gameDAO.numOfGames() + 1;
         ChessGame newChessGame = new ChessGame();
         String gameName = createGameRequest.gameName();
