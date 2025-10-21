@@ -10,6 +10,7 @@ public class GameServiceTest {
     private static GameService gameService;
     private static UserService userService;
     private static String authToken;
+    private static String username;
 
     @BeforeAll
     public static void initServices() throws DataAccessException {
@@ -17,6 +18,7 @@ public class GameServiceTest {
         userService = new UserService();
         RegAndLoginResult newUser =  userService.register(new RegisterRequest("username", "password", "email"));
         authToken = newUser.authToken();
+        username = newUser.username();
     }
     @BeforeEach
     public void clearGameDB(){
@@ -61,6 +63,17 @@ public class GameServiceTest {
 
     @Test
     public void validJoinGame(){
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "My first new game :)");
+        int createGameResult = gameService.createGame(createGameRequest);
+        Assertions.assertTrue(gameService.joinGame(username, "BLACK", createGameResult), "Should return true for successful join");
+    }
+
+    @Test
+    public void alreadyTakenJoinGame(){
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "My first new game :)");
+        int createGameResult = gameService.createGame(createGameRequest);
+        gameService.joinGame("Random User", "BLACK", createGameResult);
+        Assertions.assertFalse(gameService.joinGame(username, "BLACK", createGameResult), "Should return true for successful join");
 
     }
 
