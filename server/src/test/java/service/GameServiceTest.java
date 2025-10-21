@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class GameServiceTest {
@@ -16,6 +17,10 @@ public class GameServiceTest {
         userService = new UserService();
         RegAndLoginResult newUser =  userService.register(new RegisterRequest("username", "password", "email"));
         authToken = newUser.authToken();
+    }
+    @BeforeEach
+    public void clearGameDB(){
+        gameService.gameDAO.clearGameDB();
     }
 
     @Test
@@ -52,6 +57,11 @@ public class GameServiceTest {
         gameService.createGame(createGameRequest2);
         gameService.createGame(createGameRequest3);
         Assertions.assertNotEquals(2, gameService.gameList().size(), "Should return all created games");
+    }
+
+    @Test
+    public void validJoinGame(){
+
     }
 
 }
