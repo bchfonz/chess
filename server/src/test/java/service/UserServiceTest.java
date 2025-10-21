@@ -16,9 +16,6 @@ public class UserServiceTest {
     @BeforeAll
     public static void createUserService() throws DataAccessException {
         userService = new UserService();
-    }
-    @BeforeEach
-    public void createUser(){
         RegAndLoginResult newUser =  userService.register(new RegisterRequest("username", "password", "email"));
         usernameAuthToken = newUser.authToken();
     }
