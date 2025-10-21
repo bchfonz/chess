@@ -22,14 +22,36 @@ public class GameServiceTest {
     public void validCreateGame(){
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "My first new game :)");
         int createGameResult = gameService.createGame(createGameRequest);
-        Assertions.assertNotEquals(0, createGameResult);
+        Assertions.assertNotEquals(0, createGameResult, "Should return the gameID ");
     }
 
     @Test
     public void unauthorizedCreateGame(){
-        CreateGameRequest createGameRequest = new CreateGameRequest("Not a valid authToken", null);
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, null);
         int createGameResult = gameService.createGame(createGameRequest);
-        Assertions.assertEquals(0, createGameResult);
+        Assertions.assertEquals(0, createGameResult, "Should return 0 because the authToken was not valid");
+    }
+
+    @Test
+    public void validListGames(){
+        CreateGameRequest createGameRequest1 = new CreateGameRequest(authToken, "New game 1");
+        CreateGameRequest createGameRequest2 = new CreateGameRequest(authToken, "New game 2");
+        CreateGameRequest createGameRequest3 = new CreateGameRequest(authToken, "New game 3");
+        gameService.createGame(createGameRequest1);
+        gameService.createGame(createGameRequest2);
+        gameService.createGame(createGameRequest3);
+        Assertions.assertEquals(3, gameService.gameList().size(), "Should return all created games");
+    }
+
+    @Test
+    public void invalidListGames(){
+        CreateGameRequest createGameRequest1 = new CreateGameRequest(authToken, "New game 1");
+        CreateGameRequest createGameRequest2 = new CreateGameRequest(authToken, "New game 2");
+        CreateGameRequest createGameRequest3 = new CreateGameRequest(authToken, "New game 3");
+        gameService.createGame(createGameRequest1);
+        gameService.createGame(createGameRequest2);
+        gameService.createGame(createGameRequest3);
+        Assertions.assertNotEquals(2, gameService.gameList().size(), "Should return all created games");
     }
 
 }
