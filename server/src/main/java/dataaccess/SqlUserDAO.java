@@ -11,28 +11,21 @@ import java.sql.SQLException;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SqlUserDAO implements UserDAO{
-//    private final DatabaseManager dbManager = new DatabaseManager();
-
-    public SqlUserDAO () {
-
-    }
-
-    public void databaseAccess() throws Exception {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT 1+1")) {
-                var rs = preparedStatement.executeQuery();
-                rs.next();
-                System.out.println(rs.getInt(1));
-            }
-        }
-    }
+//    public void databaseAccess() throws Exception {
+//        try (var conn = DatabaseManager.getConnection()) {
+//            try (var preparedStatement = conn.prepareStatement("SELECT 1+1")) {
+//                var rs = preparedStatement.executeQuery();
+//                rs.next();
+//                System.out.println(rs.getInt(1));
+//            }
+//        }
+//    }
     @Override
     public UserData getUser(String username) throws DataAccessException {
         String getUserStatement = "SELECT id, username, password, email FROM users WHERE username = ?";
         try(var conn = DatabaseManager.getConnection()) {
             PreparedStatement preparedStatement = conn.prepareStatement(getUserStatement);
             preparedStatement.setString(1, username);
-
             try(ResultSet result = preparedStatement.executeQuery()){
                 if(result.next()){
                     int id = result.getInt("id");

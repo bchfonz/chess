@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
-    public final LocalUserDB userDAO = new LocalUserDB();
+    public final SqlUserDAO userDAO = new SqlUserDAO();
     public final LocalAuthDB authDAO = new LocalAuthDB();
 
     public static String generateToken() {

@@ -46,7 +46,7 @@ public class DatabaseManager {
 
     private final String[] setupTablesStatements = {
         """
-        CREATE TABLE IF NOT EXISTS users(
+        CREATE TABLE IF NOT EXISTS user(
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
@@ -79,23 +79,11 @@ public class DatabaseManager {
                 }
             }
             System.out.println("User tables created successfully.");
-        } catch (SQLException | DataAccessException ex) {
-            System.err.println("Error setting up user tables: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (SQLException | DataAccessException e) {
+            System.err.println("Error setting up user tables: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
-//    private void UserTableSetup(){
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            for (String statement : setupTablesStatements) {
-//                try (var preparedStatement = conn.prepareStatement(statement)) {
-//                    preparedStatement.executeUpdate();
-//                }
-//            }
-//        } catch (SQLException ex) {
-//
-//        }
-//    }
 
     /**
      * Create a connection to the database and sets the catalog based upon the
