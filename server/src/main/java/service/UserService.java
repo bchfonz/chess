@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class UserService {
     public final SqlUserDAO userDAO = new SqlUserDAO();
-    public final LocalAuthDB authDAO = new LocalAuthDB();
+    public final SqlAuthDAO authDAO = new SqlAuthDAO();
 
     public static String generateToken() {
         return UUID.randomUUID().toString();
@@ -41,6 +41,7 @@ public class UserService {
             UserData userData = userDAO.getUser(username);
             RegAndLoginResult loginResult;
             if(userData == null){
+                System.out.println("User not found");
                 return null;
             }
             else if (Objects.equals(userData.password(), password)) {
@@ -49,6 +50,7 @@ public class UserService {
                 loginResult = new RegAndLoginResult(username, loginAuth.authToken());
                 return loginResult;
             } else {
+                System.out.println("Passwords didn't match");
                 return null;
             }
         } catch (DataAccessException e) {

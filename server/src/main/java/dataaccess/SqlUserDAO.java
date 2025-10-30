@@ -11,15 +11,6 @@ import java.sql.SQLException;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SqlUserDAO implements UserDAO{
-//    public void databaseAccess() throws Exception {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            try (var preparedStatement = conn.prepareStatement("SELECT 1+1")) {
-//                var rs = preparedStatement.executeQuery();
-//                rs.next();
-//                System.out.println(rs.getInt(1));
-//            }
-//        }
-//    }
     @Override
     public UserData getUser(String username) throws DataAccessException {
         String getUserStatement = "SELECT id, username, password, email FROM users WHERE username = ?";
@@ -28,7 +19,6 @@ public class SqlUserDAO implements UserDAO{
             preparedStatement.setString(1, username);
             try(ResultSet result = preparedStatement.executeQuery()){
                 if(result.next()){
-                    int id = result.getInt("id");
                     String dbUsername = result.getString("username");
                     String password = result.getString("password");
                     String email = result.getString("email");
@@ -46,7 +36,7 @@ public class SqlUserDAO implements UserDAO{
 
     @Override
     public void addUser(UserData newUser) {
-        String addUserStmt = "INSERT INTO user (username, password, email) VALUES (?, ?,  ?)";
+        String addUserStmt = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         int id = executeUpdate(addUserStmt, newUser.username(), newUser.password(), newUser.email());
         if(id == 0){
             System.out.println("User not added");
