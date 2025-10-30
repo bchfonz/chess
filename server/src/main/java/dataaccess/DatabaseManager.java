@@ -1,5 +1,6 @@
 package dataaccess;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.Properties;
 
@@ -9,12 +10,26 @@ public class DatabaseManager {
     private static String dbPassword;
     private static String connectionUrl;
 
+
     /*
      * Load the database information for the db.properties file.
      */
     static {
         loadPropertiesFromResources();
+        try{
+            System.out.println("Creating database (if not exists)...");
+            DatabaseManager.createDatabase();
+            System.out.println("Database ready.");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    public DatabaseManager(){
+        System.out.println("Setting up tables...");
+        dataTableSetup();
+    }
+
 
     /**
      * Creates the database if it does not already exist.
@@ -28,6 +43,59 @@ public class DatabaseManager {
             throw new DataAccessException("failed to create database", ex);
         }
     }
+
+    private final String[] setupTablesStatements = {
+        """
+        CREATE TABLE IF NOT EXISTS users(
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            email VARCHAR(100) NOT NULL UNIQUE
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS auth(
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL,
+            authToken VARCHAR(64) NOT NULL UNIQUE
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS chessGames(
+            gameID INT AUTO_INCREMENT PRIMARY KEY,
+            whiteUsername VARCHAR(50) NOT NULL UNIQUE,
+            blackUsername VARCHAR(50) NOT NULL UNIQUE,
+            gameName VARCHAR(50) NOT NULL,
+            game JSON NOT NULL
+        )
+        """
+    };
+
+    public void dataTableSetup() {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : setupTablesStatements) {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+            System.out.println("User tables created successfully.");
+        } catch (SQLException | DataAccessException ex) {
+            System.err.println("Error setting up user tables: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+//    private void UserTableSetup(){
+//        try (Connection conn = DatabaseManager.getConnection()) {
+//            for (String statement : setupTablesStatements) {
+//                try (var preparedStatement = conn.prepareStatement(statement)) {
+//                    preparedStatement.executeUpdate();
+//                }
+//            }
+//        } catch (SQLException ex) {
+//
+//        }
+//    }
 
     /**
      * Create a connection to the database and sets the catalog based upon the

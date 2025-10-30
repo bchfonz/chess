@@ -1,5 +1,7 @@
 package server;
 
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import handlers.*;
 import io.javalin.*;
 import service.GameService;
