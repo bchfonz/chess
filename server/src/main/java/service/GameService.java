@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.LocalGameDB;
+import dataaccess.SqlGameDAO;
 import model.GameData;
 
 import java.util.*;
@@ -10,7 +11,7 @@ public class GameService {
     //If I move the local db to the service classes I might be able to keep persistance for local db
     //I'd probably have to pass in the db as an argument in all of these functions though. Or maybe
     //put in a constructor...
-    public final LocalGameDB gameDAO = new LocalGameDB();
+    public final SqlGameDAO gameDAO = new SqlGameDAO();
 
     public int createGame(CreateGameRequest createGameRequest){
         if(createGameRequest.gameName() == null){
@@ -39,32 +40,33 @@ public class GameService {
     }
 
     public boolean joinGame(String username, String playerColor, int gameID){
-        GameData curGame = gameDAO.getGame(gameID);
-        if(curGame == null){
-            return false;
-        }
-        if(Objects.equals(playerColor, "WHITE")){
-            if(curGame.whiteUsername() != null){
-                return false;
-            }
-            else{
-                GameData updatedGame = new GameData(curGame.gameID(), username, curGame.blackUsername(), curGame.gameName(), curGame.game());
-                gameDAO.updateGame(gameID, updatedGame);
-                return true;
-            }
-        }
-        else if(Objects.equals(playerColor, "BLACK")){
-            if(curGame.blackUsername() != null){
-                return false;
-            }
-            else{
-                GameData updatedGame = new GameData(curGame.gameID(), curGame.whiteUsername(), username, curGame.gameName(), curGame.game());
-                gameDAO.updateGame(gameID, updatedGame);
-                return true;
-            }
-        }
-        else{
-            return false;
-        }
+//        GameData curGame = gameDAO.getGame(gameID);
+//        if(curGame == null){
+//            return false;
+//        }
+//        if(Objects.equals(playerColor, "WHITE")){
+//            if(curGame.whiteUsername() != null){
+//                return false;
+//            }
+//            else{
+//                GameData updatedGame = new GameData(curGame.gameID(), username, curGame.blackUsername(), curGame.gameName(), curGame.game());
+//                gameDAO.updateGame(gameID, updatedGame);
+//                return true;
+//            }
+//        }
+//        else if(Objects.equals(playerColor, "BLACK")){
+//            if(curGame.blackUsername() != null){
+//                return false;
+//            }
+//            else{
+//                GameData updatedGame = new GameData(curGame.gameID(), curGame.whiteUsername(), username, curGame.gameName(), curGame.game());
+//                gameDAO.updateGame(gameID, updatedGame);
+//                return true;
+//            }
+//        }
+//        else{
+//            return false;
+//        }
+        return false;
     }
 }

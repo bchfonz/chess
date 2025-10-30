@@ -63,8 +63,8 @@ public class DatabaseManager {
         """
         CREATE TABLE IF NOT EXISTS chessGames(
             gameID INT AUTO_INCREMENT PRIMARY KEY,
-            whiteUsername VARCHAR(50) NOT NULL UNIQUE,
-            blackUsername VARCHAR(50) NOT NULL UNIQUE,
+            whiteUsername VARCHAR(50) UNIQUE,
+            blackUsername VARCHAR(50) UNIQUE,
             gameName VARCHAR(50) NOT NULL,
             game JSON NOT NULL
         )
