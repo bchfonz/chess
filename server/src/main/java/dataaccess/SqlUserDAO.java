@@ -55,8 +55,9 @@ public class SqlUserDAO implements UserDAO{
     public void addUser(UserData newUser) {
         String addUserStmt = "INSERT INTO user (username, password, email) VALUES (?, ?,  ?)";
         int id = executeUpdate(addUserStmt, newUser.username(), newUser.password(), newUser.email());
-
-
+        if(id == 0){
+            System.out.println("User not added");
+        }
     }
 
     @Override
@@ -76,33 +77,22 @@ public class SqlUserDAO implements UserDAO{
 
     private int executeUpdate(String statement, Object... params)  {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String p){
-                        ps.setString(i + 1, p);
-                    }
-                    else if (param instanceof Integer p){
-                        ps.setInt(i + 1, p);
-                    }
-                    else if (param instanceof PetType p){
-                        ps.setString(i + 1, p.toString());
-                    }
-                    else if (param == null){
-                        ps.setNull(i + 1, NULL);
-                    }
+                    preparedStatement.setString(i + 1, param.toString());
                 }
-                ps.executeUpdate();
+                preparedStatement.executeUpdate();
 
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
+                ResultSet result = preparedStatement.getGeneratedKeys();
+                if (result.next()) {
+                    System.out.println("Successfully added user to database");
+                    return result.getInt(1);
                 }
-
                 return 0;
             }
         } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new RuntimeException(e);
         }
     }
 
