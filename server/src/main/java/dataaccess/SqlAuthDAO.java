@@ -19,7 +19,7 @@ public class SqlAuthDAO implements AuthDAO{
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        String getAuthStatement = "SELECT id, username, authToken FROM auth WHERE authToken = ?";
+        String getAuthStatement = "SELECT id, authToken, username FROM auth WHERE authToken = ?";
         try(var conn = DatabaseManager.getConnection()) {
             PreparedStatement preparedStatement = conn.prepareStatement(getAuthStatement);
             preparedStatement.setString(1, authToken);
@@ -27,7 +27,7 @@ public class SqlAuthDAO implements AuthDAO{
                 if(result.next()){
                     String dbUsername = result.getString("username");
                     String dbAuthToken = result.getString("authToken");
-                    return new AuthData(dbUsername, dbAuthToken);
+                    return new AuthData(dbAuthToken, dbUsername);
                 }
                 else{
                     return null;

@@ -56,8 +56,8 @@ public class DatabaseManager {
         """
         CREATE TABLE IF NOT EXISTS auth(
             id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) NOT NULL,
-            authToken VARCHAR(64) NOT NULL UNIQUE
+            authToken VARCHAR(64) NOT NULL UNIQUE,
+            username VARCHAR(50) NOT NULL
         )
         """,
         """

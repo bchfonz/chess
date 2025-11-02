@@ -27,21 +27,28 @@ public class JoinGameHandler implements Handler {
         String authToken = ctx.header("authorization");
         JoinGameRequest joinGameRequest = gson.fromJson(ctx.body(), JoinGameRequest.class);
         AuthData authData = userServiceObj.authDAO.getAuth(authToken);
+        System.out.println("Username: " + authData.username());
+        System.out.println("authToken: " + authData.authToken());
+//        System.out.println("Test 1");
         try{
             if(authData == null){
+//                System.out.println("Test 2");
                 ctx.status(401);
                 ctx.json(gson.toJson(Map.of("message", "Error: unauthorized")));
             }
             else if(joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 ||
                     (!joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK"))){
+//                System.out.println("Test 3");
                 ctx.status(400);
                 ctx.json(gson.toJson(Map.of("message", "Error: bad request")));
             }
             else if(!gameServiceObj.joinGame(authData.username(), joinGameRequest.playerColor(), joinGameRequest.gameID())){
+//                System.out.println("Test 4");
                 ctx.status(403);
                 ctx.json(gson.toJson(Map.of("message", "Error: already taken")));
             }
             else{
+//                System.out.println("Test 5");
                 ctx.status(200);
             }
         } catch (Exception e) {

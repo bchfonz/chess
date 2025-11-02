@@ -1,9 +1,12 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import model.GameData;
+import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,13 +26,46 @@ public class SqlGameDAO implements GameDAO{
 
     @Override
     public GameData getGame(int gameID) {
-        return null;
+        String getGameStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM chessGames WHERE gameID = ?";
+        try(var conn = DatabaseManager.getConnection()) {
+            PreparedStatement preparedStatement = conn.prepareStatement(getGameStatement);
+            preparedStatement.setInt(1, gameID);
+            try(ResultSet result = preparedStatement.executeQuery()){
+                if(result.next()){
+                    String dbWhiteUsername = result.getString("whiteUsername");
+                    String dbBlackUsername = result.getString("blackUsername");
+                    String dbGameName = result.getString("gameName");
+                    Gson gson = new Gson();
+                    ChessGame dbChessGame = gson.fromJson(result.getString("game"), ChessGame.class);
+                    return new GameData(gameID, dbWhiteUsername, dbBlackUsername, dbGameName, dbChessGame);
+                }
+                else{
+                    return null;
+                }
+            }
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public int numOfGames() {
-        return 0;
+        String sql = "SELECT COUNT(*) AS count FROM chessGames";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+             ResultSet rs = preparedStatement.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+            return 0; // no rows = 0 games
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     @Override
     public HashMap<Integer, GameData> getGamesList() {
@@ -41,20 +77,44 @@ public class SqlGameDAO implements GameDAO{
 
     }
 
+    public void updateGame(int gameID, GameData updatedGame){
+        System.out.println("blackUsername in udpateGame: " + updatedGame.blackUsername());
+        System.out.println("whiteUsername in udpateGame: " + updatedGame.whiteUsername());
+        System.out.println("In update game");
+        String joinGameWhiteStatement = "UPDATE chessGames SET whiteUsername = ? WHERE gameID = ?";
+        String joinGameBlackStatement = "UPDATE chessGames SET blackUsername = ? WHERE gameID = ?";
+        executeUpdate(joinGameWhiteStatement, updatedGame.whiteUsername(), gameID);
+        executeUpdate(joinGameBlackStatement, updatedGame.blackUsername(), gameID);
+    }
+
     @Override
     public boolean emptyDB() {
         return false;
     }
 
     private void executeUpdate(String statement, Object... params)  {
+        System.out.println("In executeUpdate");
         try (Connection conn = DatabaseManager.getConnection()) {
+//            System.out.println("executeUpdate test 1");
             try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+//                System.out.println("executeUpdate test 2");
                 for (int i = 0; i < params.length; i++) {
+//                    System.out.println("executeUpdate test 3");
                     Object param = params[i];
-                    if (param instanceof String p) preparedStatement.setString(i + 1, p);
-                    else if (param == null) preparedStatement.setString(i + 1, null);
+                    if (param instanceof String p){
+                        preparedStatement.setString(i + 1, p);
+//                        System.out.println("executeUpdate test 4");
+                    }
+                    else if(param instanceof Integer p){
+                        preparedStatement.setInt(i + 1, p);
+                    }
+                    else if (param == null){
+                        preparedStatement.setString(i + 1, null);
+//                        System.out.println("executeUpdate test 5");
+                    }
                 }
-                preparedStatement.executeUpdate();
+                int rowsAffected = preparedStatement.executeUpdate();
+                System.out.println("executeUpdate test 6 — rows affected: " + rowsAffected);
 
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 if (result.next()) {
