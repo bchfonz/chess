@@ -54,10 +54,10 @@ public class SqlGameDAO implements GameDAO{
         String sql = "SELECT COUNT(*) AS count FROM chessGames";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql);
-             ResultSet rs = preparedStatement.executeQuery()) {
+             ResultSet result = preparedStatement.executeQuery()) {
 
-            if (rs.next()) {
-                return rs.getInt("count");
+            if (result.next()) {
+                return result.getInt("count");
             }
             return 0; // no rows = 0 games
 
@@ -78,9 +78,6 @@ public class SqlGameDAO implements GameDAO{
     }
 
     public void updateGame(int gameID, GameData updatedGame){
-        System.out.println("blackUsername in udpateGame: " + updatedGame.blackUsername());
-        System.out.println("whiteUsername in udpateGame: " + updatedGame.whiteUsername());
-        System.out.println("In update game");
         String joinGameWhiteStatement = "UPDATE chessGames SET whiteUsername = ? WHERE gameID = ?";
         String joinGameBlackStatement = "UPDATE chessGames SET blackUsername = ? WHERE gameID = ?";
         executeUpdate(joinGameWhiteStatement, updatedGame.whiteUsername(), gameID);
@@ -93,7 +90,6 @@ public class SqlGameDAO implements GameDAO{
     }
 
     private void executeUpdate(String statement, Object... params)  {
-        System.out.println("In executeUpdate");
         try (Connection conn = DatabaseManager.getConnection()) {
 //            System.out.println("executeUpdate test 1");
             try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -113,12 +109,11 @@ public class SqlGameDAO implements GameDAO{
 //                        System.out.println("executeUpdate test 5");
                     }
                 }
-                int rowsAffected = preparedStatement.executeUpdate();
-                System.out.println("executeUpdate test 6 — rows affected: " + rowsAffected);
+                preparedStatement.executeUpdate();
 
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 if (result.next()) {
-                    System.out.println("Successfully added user to database");
+                    System.out.println("Successfully edited chessGame database");
                 }
             }
         } catch (SQLException | DataAccessException e) {
