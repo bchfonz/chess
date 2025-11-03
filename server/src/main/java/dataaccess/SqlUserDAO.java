@@ -45,25 +45,51 @@ public class SqlUserDAO implements UserDAO{
 
     @Override
     public void clearUserDB() {
+        String clearStatement = "TRUNCATE TABLE users";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = conn.prepareStatement(clearStatement, RETURN_GENERATED_KEYS)) {
+                preparedStatement.executeUpdate();
+                ResultSet result = preparedStatement.getGeneratedKeys();
+                if (result.next()) {
+                    System.out.println("Successfully added user to database");
+                }
 
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean emptyDB() {
-        return false;
+        return numUsers() == 0;
     }
 
     @Override
     public int numUsers() {
-        return 0;
+        String sql = "SELECT COUNT(*) AS count FROM users";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+             ResultSet result = preparedStatement.executeQuery()) {
+
+            if (result.next()) {
+                return result.getInt("count");
+            }
+            return 0; // no rows = 0 games
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private int executeUpdate(String statement, Object... params)  {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    preparedStatement.setString(i + 1, param.toString());
+                if(params != null) {
+                    for (int i = 0; i < params.length; i++) {
+                        Object param = params[i];
+                        preparedStatement.setString(i + 1, param.toString());
+                    }
                 }
                 preparedStatement.executeUpdate();
 

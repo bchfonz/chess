@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -53,32 +54,66 @@ public class SqlAuthDAO implements AuthDAO{
 
     @Override
     public void clearAuthDB() throws DataAccessException {
+        String clearStatement = "TRUNCATE TABLE auth";
+//        executeUpdate(clearStatement, (Object) null);
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = conn.prepareStatement(clearStatement, RETURN_GENERATED_KEYS)) {
+                preparedStatement.executeUpdate();
+                ResultSet result = preparedStatement.getGeneratedKeys();
+                if (result.next()) {
+                    System.out.println("Successfully added user to database");
+                }
+
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
     @Override
     public boolean emptyDB() {
-        return false;
+        return numAuth() == 0;
     }
 
     @Override
     public int numAuth() {
-        return 0;
+        String sql = "SELECT COUNT(*) AS count FROM auth";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+             ResultSet result = preparedStatement.executeQuery()) {
+
+            if (result.next()) {
+                return result.getInt("count");
+            }
+            return 0; // no rows = 0 games
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void executeUpdate(String statement, Object... params)  {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                if((params == null) || (params.length == 0)) {
+                    preparedStatement.executeUpdate();
+                    return;
+                }
+                System.out.println(Arrays.toString(params));
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     preparedStatement.setString(i + 1, param.toString());
                 }
+
                 preparedStatement.executeUpdate();
 
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 if (result.next()) {
                     System.out.println("Successfully added user to database");
                 }
+
             }
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
