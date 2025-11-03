@@ -76,20 +76,20 @@ public class SqlGameDAO implements GameDAO{
     @Override
     public List<GameData> getGamesList() {
         List<GameData> games = new ArrayList<>();
-        String sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+        String getGamesStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM chessGames";
 
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet result = stmt.executeQuery()) {
+             PreparedStatement preparedStatement = conn.prepareStatement(getGamesStatement);
+             ResultSet result = preparedStatement.executeQuery()) {
 
             while (result.next()) {
-                int id = result.getInt("gameID");
-                String name = result.getString("gameName");
-                String white = result.getString("whiteUsername");
-                String black = result.getString("blackUsername");
+                int gameID = result.getInt("gameID");
+                String whiteUsername = result.getString("whiteUsername");
+                String blackUsername = result.getString("blackUsername");
+                String gameName = result.getString("gameName");
                 ChessGame chessGame = new Gson().fromJson(result.getString("game"), ChessGame.class);
 
-                GameData game = new GameData(id, name, white, black, chessGame);
+                GameData game = new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
                 games.add(game);
             }
 
