@@ -99,6 +99,10 @@ public class SqlGameDAO implements GameDAO{
     @Override
     public void clearGameDB() {
         String clearStatement = "TRUNCATE TABLE chessGames";
+        updateNoParams(clearStatement);
+    }
+
+    static void updateNoParams(String clearStatement) {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(clearStatement, RETURN_GENERATED_KEYS)) {
                 preparedStatement.executeUpdate();

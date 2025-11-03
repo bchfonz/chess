@@ -56,20 +56,7 @@ public class SqlAuthDAO implements AuthDAO{
     public void clearAuthDB() throws DataAccessException {
         String clearStatement = "TRUNCATE TABLE auth";
 //        executeUpdate(clearStatement, (Object) null);
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement = conn.prepareStatement(clearStatement, RETURN_GENERATED_KEYS)) {
-                preparedStatement.executeUpdate();
-                ResultSet result = preparedStatement.getGeneratedKeys();
-                if (result.next()) {
-                    System.out.println("Successfully added user to database");
-                }
-
-            }
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-
+        SqlGameDAO.updateNoParams(clearStatement);
     }
 
     @Override
