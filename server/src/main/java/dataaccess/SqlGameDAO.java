@@ -69,10 +69,6 @@ public class SqlGameDAO implements GameDAO{
     }
 
 
-//    @Override
-//    public HashMap<Integer, GameData> getGamesList() {
-//        return null;
-//    }
     @Override
     public List<GameData> getGamesList() {
         List<GameData> games = new ArrayList<>();
@@ -132,22 +128,15 @@ public class SqlGameDAO implements GameDAO{
 
     private void executeUpdate(String statement, Object... params)  {
         try (Connection conn = DatabaseManager.getConnection()) {
-//            System.out.println("executeUpdate test 1");
             try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-//                System.out.println("executeUpdate test 2");
-                if(params != null) {
-                    for (int i = 0; i < params.length; i++) {
-//                    System.out.println("executeUpdate test 3");
-                        Object param = params[i];
-                        if (param instanceof String p) {
-                            preparedStatement.setString(i + 1, p);
-//                        System.out.println("executeUpdate test 4");
-                        } else if (param instanceof Integer p) {
-                            preparedStatement.setInt(i + 1, p);
-                        } else if (param == null) {
-                            preparedStatement.setString(i + 1, null);
-//                        System.out.println("executeUpdate test 5");
-                        }
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) {
+                        preparedStatement.setString(i + 1, p);
+                    } else if (param instanceof Integer p) {
+                        preparedStatement.setInt(i + 1, p);
+                    } else if (param == null) {
+                        preparedStatement.setString(i + 1, null);
                     }
                 }
                 preparedStatement.executeUpdate();

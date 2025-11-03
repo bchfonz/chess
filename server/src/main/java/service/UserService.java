@@ -34,8 +34,6 @@ public class UserService {
     }
     public RegAndLoginResult login(LoginRequest loginRequest) {
         try {
-            System.out.println("Number of users when trying to login: "+ userDAO.numUsers());
-            System.out.println("Number of auth when trying to login: "+ authDAO.numAuth());
             String username = loginRequest.username();
             String password = loginRequest.password();
             UserData userData = userDAO.getUser(username);
