@@ -26,12 +26,12 @@ public class GameService {
 
     public List<ListGamesResult> gameList(){
         List<ListGamesResult> listGamesResults = new ArrayList<>();
-        HashMap<Integer, GameData> gameList = gameDAO.getGamesList();
-        for(Map.Entry<Integer, GameData> game : gameList.entrySet()){
-            int curGameID = game.getValue().gameID();
-            String curWhiteUsername = game.getValue().whiteUsername();
-            String curBlackUsername = game.getValue().blackUsername();
-            String curGameName = game.getValue().gameName();
+        List<GameData> gameList = gameDAO.getGamesList();
+        for(GameData game : gameList){
+            int curGameID = game.gameID();
+            String curWhiteUsername = game.whiteUsername();
+            String curBlackUsername = game.blackUsername();
+            String curGameName = game.gameName();
             ListGamesResult listGamesResult = new ListGamesResult(curGameID, curWhiteUsername, curBlackUsername, curGameName);
             listGamesResults.add(listGamesResult);
         }

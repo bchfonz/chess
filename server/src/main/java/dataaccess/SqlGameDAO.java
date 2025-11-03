@@ -11,7 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -67,9 +69,35 @@ public class SqlGameDAO implements GameDAO{
     }
 
 
+//    @Override
+//    public HashMap<Integer, GameData> getGamesList() {
+//        return null;
+//    }
     @Override
-    public HashMap<Integer, GameData> getGamesList() {
-        return null;
+    public List<GameData> getGamesList() {
+        List<GameData> games = new ArrayList<>();
+        String sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet result = stmt.executeQuery()) {
+
+            while (result.next()) {
+                int id = result.getInt("gameID");
+                String name = result.getString("gameName");
+                String white = result.getString("whiteUsername");
+                String black = result.getString("blackUsername");
+                ChessGame chessGame = new Gson().fromJson(result.getString("game"), ChessGame.class);
+
+                GameData game = new GameData(id, name, white, black, chessGame);
+                games.add(game);
+            }
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException("Error retrieving all games", e);
+        }
+
+        return games;
     }
 
     @Override

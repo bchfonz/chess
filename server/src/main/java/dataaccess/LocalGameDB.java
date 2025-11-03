@@ -2,7 +2,9 @@ package dataaccess;
 
 import model.GameData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class LocalGameDB implements GameDAO{
     private final HashMap<Integer, GameData> gameDB = new HashMap<>();
@@ -23,8 +25,8 @@ public class LocalGameDB implements GameDAO{
         gameDB.put(gameID, updatedGamed);
     }
 
-    public HashMap<Integer, GameData> getGamesList(){
-        return gameDB;
+    public List<GameData> getGamesList() {
+        return new ArrayList<>(gameDB.values());
     }
     @Override
     public void clearGameDB() {
