@@ -66,9 +66,9 @@ public class SqlAuthDAO implements AuthDAO{
 
     @Override
     public int numAuth() {
-        String sql = "SELECT COUNT(*) AS count FROM auth";
+        String getCountStatement = "SELECT COUNT(*) AS count FROM auth";
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+             PreparedStatement preparedStatement = conn.prepareStatement(getCountStatement);
              ResultSet result = preparedStatement.executeQuery()) {
 
             if (result.next()) {
