@@ -97,7 +97,6 @@ public class StandardAPITests {
 
         for (TestUser unauthorizedLoginRequest : unauthorizedLoginRequests) {
             TestAuthResult loginResult = serverFacade.login(unauthorizedLoginRequest);
-
             assertHttpUnauthorized(loginResult);
             assertAuthFieldsMissing(loginResult);
         }

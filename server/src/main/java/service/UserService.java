@@ -39,13 +39,13 @@ public class UserService {
             String username = loginRequest.username();
             String password = loginRequest.password();
             UserData userData = userDAO.getUser(username);
-            String hashedPassword = userData.password();
             RegAndLoginResult loginResult;
             if(userData == null){
                 System.out.println("User not found");
                 return null;
             }
-            else if (BCrypt.checkpw(password, hashedPassword)) {
+            String hashedPassword = userData.password();
+            if (BCrypt.checkpw(password, hashedPassword)) {
                 AuthData loginAuth = new AuthData(generateToken(), username);
                 authDAO.addAuth(loginAuth);
                 loginResult = new RegAndLoginResult(username, loginAuth.authToken());
