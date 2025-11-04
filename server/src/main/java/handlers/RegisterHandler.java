@@ -1,13 +1,15 @@
 package handlers;
-
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import org.eclipse.jetty.server.Authentication;
 import service.RegAndLoginResult;
 import service.RegisterRequest;
 import service.UserService;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
 public class RegisterHandler implements Handler {
@@ -19,7 +21,18 @@ public class RegisterHandler implements Handler {
     }
     @Override
     public void handle(Context ctx) {
-        // Example: read JSON and respond
+
+//        Test DataBase connection
+        try (Connection conn = DatabaseManager.getConnection()) {
+            System.out.println("Database connection credentials are correct");
+        } catch (DataAccessException | SQLException e) {
+            ctx.status(500);
+            ctx.json(gson.toJson(Map.of("message", "Error: unable to connect to database")));
+            return;
+        }
+
+
+
         RegisterRequest user = gson.fromJson(ctx.body(), RegisterRequest.class);
         System.out.println("Username: " + user.username() + " Password: " + user.password() + " Email: " + user.email());
         RegAndLoginResult result = userServiceObj.register(user);

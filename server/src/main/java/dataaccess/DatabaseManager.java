@@ -25,7 +25,7 @@ public class DatabaseManager {
         }
     }
 
-    public DatabaseManager(){
+    public DatabaseManager() throws  DataAccessException{
         System.out.println("Setting up tables...");
         dataTableSetup();
     }
@@ -99,7 +99,7 @@ public class DatabaseManager {
      */
 
 
-    static Connection getConnection() throws DataAccessException {
+    public static Connection getConnection() throws DataAccessException {
         try {
             //do not wrap the following line with a try-with-resources
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);

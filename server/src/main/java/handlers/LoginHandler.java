@@ -1,6 +1,8 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.UserData;
@@ -10,6 +12,8 @@ import service.RegAndLoginResult;
 import service.RegisterRequest;
 import service.UserService;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
 public class LoginHandler implements Handler {
@@ -22,6 +26,13 @@ public class LoginHandler implements Handler {
 
     @Override
     public void handle(@NotNull Context ctx){
+        try (Connection conn = DatabaseManager.getConnection()) {
+            System.out.println("Database connection credentials are correct");
+        } catch (DataAccessException | SQLException e) {
+            ctx.status(500);
+            ctx.json(gson.toJson(Map.of("message", "Error: unable to connect to database")));
+            return;
+        }
         //I need to make sure they aren't already logged in
         LoginRequest user = gson.fromJson(ctx.body(), LoginRequest.class);
         RegAndLoginResult loginResult = userServiceObj.login(user);

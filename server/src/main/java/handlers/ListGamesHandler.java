@@ -1,6 +1,8 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import dataaccess.GameDAO;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -10,6 +12,8 @@ import service.GameService;
 import service.ListGamesResult;
 import service.UserService;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +28,13 @@ public class ListGamesHandler implements Handler {
 
     @Override
     public void handle(@NotNull Context ctx) throws Exception {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            System.out.println("Database connection credentials are correct");
+        } catch (DataAccessException | SQLException e) {
+            ctx.status(500);
+            ctx.json(gson.toJson(Map.of("message", "Error: unable to connect to database")));
+            return;
+        }
         String authToken = ctx.header("authorization");
         try{
             if(userServiceObj.authDAO.getAuth(authToken) == null){

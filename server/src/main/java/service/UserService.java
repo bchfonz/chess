@@ -16,6 +16,8 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
+
+
     public RegAndLoginResult register(RegisterRequest registerRequest) {
         UserData userFromReq = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
         try{

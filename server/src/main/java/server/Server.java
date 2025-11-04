@@ -28,8 +28,8 @@ public class Server {
         try {
             new DatabaseManager();
             System.out.println("Database and tables successfully set up!");
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (DataAccessException e) {
+            System.out.println("what da fweak");
         }
 
 
