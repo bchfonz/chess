@@ -25,6 +25,12 @@ public class Server {
         javalin.post("/game", new CreateGameHandler(gameServiceObj, userServiceObj));
         javalin.put("/game", new JoinGameHandler(gameServiceObj, userServiceObj));
 
+        try {
+            new DatabaseManager();
+            System.out.println("Database and tables successfully set up!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
 

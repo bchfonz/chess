@@ -9,11 +9,6 @@ public class Main {
 
         System.out.println("♕ 240 Chess Server");
 
-        try {
-            new DatabaseManager();
-            System.out.println("Database and tables successfully set up!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 }
