@@ -1,11 +1,20 @@
 package client;
 
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
+import service.LoginRequest;
 import service.RegAndLoginResult;
 import service.RegisterRequest;
+import service.ClearService;
+
+import javax.xml.crypto.Data;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,10 +28,10 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
+        ClearService clear = new ClearService();
+        clear.clearAllDB(server.userServiceObj, server.gameServiceObj);
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-//        facade = new server.ServerFacade(String.format("localhost:%d", port));
-//        Not sure if I need the http://, so I have this here just in case I want to switch it real quick
         facade = new ServerFacade(String.format("http://localhost:%d", port));
     }
 
@@ -34,19 +43,29 @@ public class ServerFacadeTests {
 
     @Test
     void validRegister() throws Exception {
-        RegAndLoginResult authData = facade.register(new RegisterRequest("player1", "password", "p1@email.com"));
+        RegAndLoginResult authData = facade.register(new RegisterRequest("user", "password", "user@email.com"));
         assertTrue(authData.authToken().length() > 10);
     }
 
     @Test
     void duplicateRegister() throws ResponseException {
-        facade.register(new RegisterRequest("sameUser", "password", "user@email.com"));
+//        facade.register(new RegisterRequest("sameUser", "password", "user@email.com"));
 
         assertThrows(Exception.class, () ->
-            facade.register(new RegisterRequest("sameUser", "password", "user@email.com")));
+            facade.register(new RegisterRequest("user", "sameUsername", "user@email.com")));
     }
 
+    @Test
+    void validLogin() throws Exception {
+        RegAndLoginResult authData = facade.login(new LoginRequest("user", "password"));
+        assertTrue(authData.authToken().length() > 10);
+    }
 
+    @Test
+    void invalidLogin() throws Exception {
+        assertThrows(Exception.class, () ->
+                facade.login(new LoginRequest("user", "wrongPassword")));
+    }
 
     @Test
     public void sampleTest() {

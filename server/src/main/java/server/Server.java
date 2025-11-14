@@ -10,12 +10,16 @@ import service.UserService;
 public class Server {
 
     private final Javalin javalin;
+    public UserService userServiceObj;
+    public GameService gameServiceObj;
 
     public Server() {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-        UserService userServiceObj = new UserService();
-        GameService gameServiceObj = new GameService();
+        userServiceObj = new UserService();
+        gameServiceObj = new GameService();
+//        UserService userServiceObj = new UserService();
+//        GameService gameServiceObj = new GameService();
         // Register your endpoints and exception handlers here.
         javalin.delete("/db", new ClearHandler(userServiceObj, gameServiceObj));
         javalin.post("/user", new RegisterHandler(userServiceObj));
