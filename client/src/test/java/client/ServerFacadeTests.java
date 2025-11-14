@@ -1,11 +1,13 @@
 package client;
 
+import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 import service.RegAndLoginResult;
 import service.RegisterRequest;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -35,6 +37,16 @@ public class ServerFacadeTests {
         RegAndLoginResult authData = facade.register(new RegisterRequest("player1", "password", "p1@email.com"));
         assertTrue(authData.authToken().length() > 10);
     }
+
+    @Test
+    void duplicateRegister() throws ResponseException {
+        facade.register(new RegisterRequest("sameUser", "password", "user@email.com"));
+
+        assertThrows(Exception.class, () ->
+            facade.register(new RegisterRequest("sameUser", "password", "user@email.com")));
+    }
+
+
 
     @Test
     public void sampleTest() {
