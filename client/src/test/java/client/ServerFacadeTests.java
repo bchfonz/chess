@@ -6,18 +6,14 @@ import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
-import service.LoginRequest;
-import service.RegAndLoginResult;
-import service.RegisterRequest;
-import service.ClearService;
+import service.*;
 
 import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -65,6 +61,18 @@ public class ServerFacadeTests {
     void invalidLogin() throws Exception {
         assertThrows(Exception.class, () ->
                 facade.login(new LoginRequest("user", "wrongPassword")));
+    }
+
+    @Test
+    void logout() throws Exception{
+        RegAndLoginResult authData = facade.login(new LoginRequest("user", "password"));
+        LogoutRequest logoutRequest = new LogoutRequest(authData.authToken());
+        assertDoesNotThrow(() -> facade.logout(logoutRequest));
+    }
+
+    @Test
+    void invalidLogout() throws Exception{
+        assertFalse(facade.logout(new LogoutRequest("badtoken")));
     }
 
     @Test

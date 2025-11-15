@@ -28,9 +28,10 @@ public class ServerFacade {
         var response = sendRequest(request);
         return handleResponse(response, RegAndLoginResult.class);
     }
-    public void logout(LogoutRequest logoutRequest) throws ResponseException {
+    public boolean logout(LogoutRequest logoutRequest) throws ResponseException {
         var request = buildRequest("DELETE", "/session", logoutRequest);
-        sendRequest(request);
+        var response = sendRequest(request);
+        return isSuccessful(response.statusCode());
     }
     public ListGamesResult listGames() throws ResponseException {
         var request = buildRequest("GET", "/game", null);
