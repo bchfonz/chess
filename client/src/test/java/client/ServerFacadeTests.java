@@ -20,15 +20,24 @@ public class ServerFacadeTests {
 
     private static Server server;
     static ServerFacade facade;
+    private static RegAndLoginResult mainAuth;
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws Exception {
         server = new Server();
         ClearService clear = new ClearService();
         clear.clearAllDB(server.userServiceObj, server.gameServiceObj);
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade(String.format("http://localhost:%d", port));
+        mainAuth = facade.register(new RegisterRequest( "mainUser", "mainPassword", "main@email.com"));
+        System.out.println("AUTHTOKEN: " + mainAuth.authToken());
+//        try{
+//            mainAuth = facade.register(new RegisterRequest( "mainUser", "mainPassword", "main@email.com"));
+//        } catch (ResponseException e) {
+//            throw new RuntimeException(e);
+//        }
+
     }
 
     @AfterAll
@@ -64,16 +73,34 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void logout() throws Exception{
-        RegAndLoginResult authData = facade.login(new LoginRequest("user", "password"));
+    void validLogout() throws Exception {
+        RegAndLoginResult authData = facade.register(new RegisterRequest("testUser", "password", "cool@email.com"));
+//         = facade.login(new LoginRequest("user", "password"));
         LogoutRequest logoutRequest = new LogoutRequest(authData.authToken());
         assertDoesNotThrow(() -> facade.logout(logoutRequest));
     }
 
     @Test
-    void invalidLogout() throws Exception{
+    void invalidLogout() throws Exception {
         assertFalse(facade.logout(new LogoutRequest("badtoken")));
     }
+
+    @Test
+    void validCreateGame() throws Exception {
+        CreateGameRequest createGameRequest = new CreateGameRequest(mainAuth.authToken(), "Jesus Loves You");
+        assertDoesNotThrow(() -> facade.createGame(createGameRequest));
+    }
+
+    @Test
+    void invalidCreateGame() throws Exception {
+        CreateGameRequest req = new CreateGameRequest(mainAuth.authToken(), null);
+        assertFalse(facade.createGame(req));
+    }
+
+//    @Test
+//    void validListGames() throws Exception {
+//
+//    }
 
     @Test
     public void sampleTest() {

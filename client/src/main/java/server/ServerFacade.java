@@ -38,9 +38,11 @@ public class ServerFacade {
         var response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
     }
-    public void createGame(CreateGameRequest createGameRequest) throws ResponseException {
+    public boolean createGame(CreateGameRequest createGameRequest) throws ResponseException {
         var request = buildRequest("POST", "/game", createGameRequest);
-        sendRequest(request);
+        var response = sendRequest(request);
+        System.out.println("Response code: " + response.statusCode());
+        return isSuccessful(response.statusCode());
 
     }
     public void joinGame(JoinGameRequest joinGameRequest) throws ResponseException {
