@@ -15,7 +15,7 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerFacadeTests {
 
     private static Server server;
@@ -137,10 +137,12 @@ public class ServerFacadeTests {
         assertFalse(joined);
     }
 
-//    @Test
-//    public void sampleTest() {
-//        assertTrue(true);
-//    }
+    @Order(12)
+    @Test
+    void validClear() throws Exception {
+        assertTrue(facade.clear());
+    }
+
 
 }
 

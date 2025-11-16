@@ -59,9 +59,10 @@ public class ServerFacade {
         var response = sendRequest(request);
         return isSuccessful(response.statusCode());
     }
-    public void clear() throws ResponseException {
+    public boolean clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
-        sendRequest(request);
+        var response = sendRequest(request);
+        return isSuccessful(response.statusCode());
     }
 
     private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
