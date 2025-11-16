@@ -19,50 +19,87 @@ public class ServerFacade {
     }
 
     public RegAndLoginResult register(RegisterRequest regRequest) throws ResponseException {
-        var request = buildRequest("POST", "/user", regRequest);
+        var request = buildRequest("POST", "/user", regRequest, null);
         var response = sendRequest(request);
+        System.out.println("register response code: " + response.statusCode());
         return handleResponse(response, RegAndLoginResult.class);
     }
     public RegAndLoginResult login(LoginRequest loginRequest) throws ResponseException {
-        var request = buildRequest("POST", "/session", loginRequest);
+        var request = buildRequest("POST", "/session", loginRequest, null);
         var response = sendRequest(request);
+        System.out.println("login response code: " + response.statusCode());
         return handleResponse(response, RegAndLoginResult.class);
     }
     public boolean logout(LogoutRequest logoutRequest) throws ResponseException {
-        var request = buildRequest("DELETE", "/session", logoutRequest);
+        var request = buildRequest("DELETE", "/session", null, logoutRequest.authToken());
         var response = sendRequest(request);
+        System.out.println("logout response code: " + response.statusCode());
         return isSuccessful(response.statusCode());
     }
-    public ListGamesResult listGames() throws ResponseException {
-        var request = buildRequest("GET", "/game", null);
+    public ListGamesResult listGames(String authToken) throws ResponseException {
+        var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
+        System.out.println("ListGames response:" + response.body());
         return handleResponse(response, ListGamesResult.class);
     }
-    public boolean createGame(CreateGameRequest createGameRequest) throws ResponseException {
-        var request = buildRequest("POST", "/game", createGameRequest);
+    public boolean createGame(CreateGameRequest createGameRequest, String authToken) throws ResponseException {
+        var request = buildRequest("POST", "/game", createGameRequest, authToken);
         var response = sendRequest(request);
-        System.out.println("Response code: " + response.statusCode());
+        System.out.println("createGame response code: " + response.statusCode());
         return isSuccessful(response.statusCode());
 
     }
-    public void joinGame(JoinGameRequest joinGameRequest) throws ResponseException {
-        var request = buildRequest("PUT", "/game", joinGameRequest);
+    public void joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
+        var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
         sendRequest(request);
     }
     public void clear() throws ResponseException {
-        var request = buildRequest("DELETE", "/db", null);
+        var request = buildRequest("DELETE", "/db", null, null);
         sendRequest(request);
     }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(serverUrl + path))
-                .method(method, makeRequestBody(body));
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
+        var builder = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + path));
+
+        // Add JSON body if provided
         if (body != null) {
-            request.setHeader("Content-Type", "application/json");
+            builder.method(method, HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)));
+            builder.setHeader("Content-Type", "application/json");
+        } else {
+            builder.method(method, HttpRequest.BodyPublishers.noBody());
         }
-        return request.build();
+
+        // Add optional auth header
+        if (authToken != null) {
+            builder.setHeader("authorization", authToken);
+        }
+
+        return builder.build();
     }
+
+//    private HttpRequest buildRequest(String method, String path, Object body) {
+//        var request = HttpRequest.newBuilder()
+//                .uri(URI.create(serverUrl + path))
+//                .method(method, makeRequestBody(body));
+//        if (body != null) {
+//            request.setHeader("Content-Type", "application/json");
+//        }
+//        return request.build();
+//    }
+//
+//    // Header-only request (no JSON body)
+//    private HttpRequest buildRequest(String method, String path, String authToken) {
+//        var request = HttpRequest.newBuilder()
+//                .uri(URI.create(serverUrl + path))
+//                .method(method, HttpRequest.BodyPublishers.noBody());
+//
+//        if (authToken != null) {
+//            request.setHeader("authorization", authToken);
+//        }
+//
+//        return request.build();
+//    }
 
     private HttpRequest.BodyPublisher makeRequestBody(Object request) {
         if (request != null) {

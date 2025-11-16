@@ -29,7 +29,7 @@ public class ListGamesHandler implements Handler {
     @Override
     public void handle(@NotNull Context ctx) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
-            System.out.println("Database connection credentials are correct");
+//            System.out.println("Database connection credentials are correct");
         } catch (DataAccessException | SQLException e) {
             ctx.status(500);
             ctx.json(gson.toJson(Map.of("message", "Error: unable to connect to database")));

@@ -104,7 +104,6 @@ public class SqlGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 if (result.next()) {
-                    System.out.println("Successfully added user to database");
                 }
 
             }
@@ -143,7 +142,6 @@ public class SqlGameDAO implements GameDAO{
 
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 if (result.next()) {
-                    System.out.println("Successfully edited chessGame database");
                 }
             }
         } catch (SQLException | DataAccessException e) {

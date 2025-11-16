@@ -26,7 +26,7 @@ public class CreateGameHandler implements Handler {
     @Override
     public void handle(@NotNull Context ctx) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
-            System.out.println("Database connection credentials are correct");
+//            System.out.println("Database connection credentials are correct");
         } catch (DataAccessException | SQLException e) {
             ctx.status(500);
             ctx.json(gson.toJson(Map.of("message", "Error: unable to connect to database")));
@@ -36,7 +36,7 @@ public class CreateGameHandler implements Handler {
         System.out.println("Authtoken: " + authToken);
         Map<String, String> gameMap = gson.fromJson(ctx.body(), Map.class);
         String gameName = gameMap.get("gameName");
-        System.out.println("Game name: " + gameName);
+//        System.out.println("Game name: " + gameName);
 
 
         try{

@@ -24,7 +24,7 @@ public class RegisterHandler implements Handler {
 
 //        Test DataBase connection
         try (Connection conn = DatabaseManager.getConnection()) {
-            System.out.println("Database connection credentials are correct");
+//            System.out.println("Database connection credentials are correct");
         } catch (DataAccessException | SQLException e) {
             ctx.status(500);
             ctx.json(gson.toJson(Map.of("message", "Error: unable to connect to database")));
@@ -34,7 +34,7 @@ public class RegisterHandler implements Handler {
 
 
         RegisterRequest user = gson.fromJson(ctx.body(), RegisterRequest.class);
-        System.out.println("Username: " + user.username() + " Password: " + user.password() + " Email: " + user.email());
+//        System.out.println("Username: " + user.username() + " Password: " + user.password() + " Email: " + user.email());
         RegAndLoginResult result = userServiceObj.register(user);
         if(user.username() == null || user.password() == null || user.email() == null){
             System.out.println("In bad requests");
@@ -48,8 +48,8 @@ public class RegisterHandler implements Handler {
         }
         else{
             ctx.status(200);
-            System.out.println("In successful register");
-            System.out.println("Response: " + ctx.status());
+//            System.out.println("In successful register");
+//            System.out.println("Response: " + ctx.status());
 
             ctx.result(gson.toJson(result));
         }

@@ -43,8 +43,8 @@ public class GameService {
         if(curGame == null){
             return false;
         }
-        System.out.println("Current white player:" + curGame.whiteUsername());
-        System.out.println("Current black player:" + curGame.blackUsername());
+//        System.out.println("Current white player:" + curGame.whiteUsername());
+//        System.out.println("Current black player:" + curGame.blackUsername());
         if(Objects.equals(playerColor, "WHITE")){
             if(curGame.whiteUsername() != null){
                 return false;
@@ -60,7 +60,7 @@ public class GameService {
                 return false;
             }
             else{
-                System.out.println("Attempting to update game");
+//                System.out.println("Attempting to update game");
                 GameData updatedGame = new GameData(curGame.gameID(), curGame.whiteUsername(), username, curGame.gameName(), curGame.game());
                 gameDAO.updateGame(gameID, updatedGame);
                 return true;

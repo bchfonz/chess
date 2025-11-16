@@ -88,7 +88,7 @@ public class SqlAuthDAO implements AuthDAO{
                     preparedStatement.executeUpdate();
                     return;
                 }
-                System.out.println(Arrays.toString(params));
+//                System.out.println(Arrays.toString(params));
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     preparedStatement.setString(i + 1, param.toString());
@@ -98,7 +98,7 @@ public class SqlAuthDAO implements AuthDAO{
 
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 if (result.next()) {
-                    System.out.println("Successfully added user to database");
+//                    System.out.println("Successfully added user to database");
                 }
 
             }
