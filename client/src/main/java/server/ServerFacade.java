@@ -40,7 +40,12 @@ public class ServerFacade {
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
         System.out.println("ListGames response:" + response.body());
-        return handleResponse(response, ListGamesResult.class);
+        if(!isSuccessful(response.statusCode())){
+            return null;
+        }
+        else{
+            return handleResponse(response, ListGamesResult.class);
+        }
     }
     public boolean createGame(CreateGameRequest createGameRequest, String authToken) throws ResponseException {
         var request = buildRequest("POST", "/game", createGameRequest, authToken);

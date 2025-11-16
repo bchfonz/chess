@@ -115,6 +115,15 @@ public class ServerFacadeTests {
         assertNotNull(games);
     }
 
+    @Order(10)
+    @Test
+    void invalidListGames() throws Exception {
+        facade.createGame(new CreateGameRequest(mainAuth.authToken(), "I need a game in the database"), mainAuth.authToken());
+        facade.createGame(new CreateGameRequest(mainAuth.authToken(), "2.0"), mainAuth.authToken());
+        var games = facade.listGames("Bad Auth Token");
+        assertNull(games);
+    }
+
 //    @Test
 //    public void sampleTest() {
 //        assertTrue(true);
