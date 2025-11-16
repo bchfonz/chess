@@ -54,9 +54,10 @@ public class ServerFacade {
         return isSuccessful(response.statusCode());
 
     }
-    public void joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
+    public boolean joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
         var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
-        sendRequest(request);
+        var response = sendRequest(request);
+        return isSuccessful(response.statusCode());
     }
     public void clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
