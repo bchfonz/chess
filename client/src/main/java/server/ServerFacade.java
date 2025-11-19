@@ -22,12 +22,34 @@ public class ServerFacade {
         var request = buildRequest("POST", "/user", regRequest, null);
         var response = sendRequest(request);
         System.out.println("register response code: " + response.statusCode());
+        if(!isSuccessful(response.statusCode())){
+            if(response.statusCode() == 403){
+                System.out.println("Error " + response.statusCode());
+                System.out.println("\"message\"  \"Error: username already taken\"");
+            }
+            else if(response.statusCode() == 400){
+                System.out.println("Error " + response.statusCode());
+                System.out.println("\"message\"  \"Error: bad request\"");
+            }
+            return null;
+        }
         return handleResponse(response, RegAndLoginResult.class);
     }
     public RegAndLoginResult login(LoginRequest loginRequest) throws ResponseException {
         var request = buildRequest("POST", "/session", loginRequest, null);
         var response = sendRequest(request);
         System.out.println("login response code: " + response.statusCode());
+        if(!isSuccessful(response.statusCode())){
+            if(response.statusCode() == 401){
+                System.out.println("Error " + response.statusCode());
+                System.out.println("\"message\"  \"Error: unauthorized\"");
+            }
+            else if(response.statusCode() == 400){
+                System.out.println("Error " + response.statusCode());
+                System.out.println("\"message\"  \"Error: bad request\"");
+            }
+            return null;
+        }
         return handleResponse(response, RegAndLoginResult.class);
     }
     public boolean logout(LogoutRequest logoutRequest) throws ResponseException {

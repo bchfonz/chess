@@ -1,10 +1,29 @@
 import chess.*;
+import exception.ResponseException;
+import server.Server;
+import service.LoginRequest;
+import service.RegisterRequest;
+import server.ServerFacade;
+import ui.PostLoginUI;
 
 import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+    static ServerFacade facade;
+    static PostLoginUI postLoginUI;
+//    static Server server;
+    public static void init(){
+//        server = new Server();
+//        var port = server.run(0);
+        int port = 8080;
+        System.out.println("Started test HTTP server on " + port);
+        facade = new ServerFacade(String.format("http://localhost:%d", port));
+        postLoginUI = new PostLoginUI(facade);
+    }
+//    private static ServerFacade serverFacadeObj = new ServerFacade();
     public static void main(String[] args) {
+        Main.init();
 //        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         for (var i = 0; i < args.length; i++) {
             System.out.printf("%d. %s%n", i+1, args[i]);
@@ -26,14 +45,48 @@ public class Main {
                     System.out.println("help - with possible commands");
                 }
                 case "register" -> {
-                    System.out.println("In register");
+                    String username = inputs[1];
+                    String password= inputs[2];
+                    String email = inputs[3];
+                    RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+                    try {
+                        var response = facade.register(registerRequest);
+                        if(response != null) {
+                            if (response.authToken().length() > 10) {
+                                System.out.println("Logged in as " + response.username());
+                                exit = postLoginUI.postLogin();
+                            }
+                        }
+
+                    } catch (ResponseException e) {
+//                        System.out.println("In response excepti");
+//                        System.out.println("Exception e: " + e);
+                        throw new RuntimeException(e);
+                    }
                 }
                 case "login" -> {
                     System.out.println("In Login");
+                    String username = inputs[1];
+                    String password= inputs[2];
+                    LoginRequest loginRequest = new LoginRequest(username, password);
+                    try {
+                        var response = facade.login(loginRequest);
+                        if(response != null) {
+                            if (response.authToken().length() > 10) {
+                                System.out.println("Logged in as " + response.username());
+                                exit = postLoginUI.postLogin();
+                            }
+                        }
+
+                    } catch (ResponseException e) {
+//                        System.out.println("In response excepti");
+//                        System.out.println("Exception e: " + e);
+                        throw new RuntimeException(e);
+                    }
                 }
                 case "quit" -> {
                     exit = true;
-                    System.out.println("Thanks for playing!");
+//                    server.stop();
                 }
                 case null, default -> {
                     System.out.println("Invalid input. Valid inputs:");
@@ -44,6 +97,7 @@ public class Main {
                 }
             }
         }
+        System.out.println("Thanks for playing!");
 
     }
 }
