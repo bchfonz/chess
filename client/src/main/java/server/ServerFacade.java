@@ -99,6 +99,11 @@ public class ServerFacade {
             return null;
         }
     }
+
+//    public GameData observeGame(int id, String authToken) throws ResponseException {
+//        var request = buildRequest("GET", "/game", id, authToken);
+//        var resonse = sendRequest(request);
+//    }
     public boolean clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
         var response = sendRequest(request);

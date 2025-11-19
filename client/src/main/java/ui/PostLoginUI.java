@@ -1,5 +1,6 @@
 package ui;
 
+import dataaccess.SqlGameDAO;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
@@ -89,6 +90,22 @@ public class PostLoginUI {
                     }
                 }
                 case "observe" -> {
+                    int id = Integer.parseInt(inputs[1]);
+                    int gameID = 0;
+                    if(gameMap.get(id) == null){
+                        System.out.println("Invalid game ID");
+                    }
+                    else{
+                        gameID = gameMap.get(id);
+                        GameData game = new SqlGameDAO().getGame(gameID);
+                        if(game == null){
+                            System.out.println("Invalid game ID");
+                        }
+                        else{
+                            gameplayUI.observeGame(game);
+                        }
+                    }
+
 
                 }
                 case "logout" -> {
