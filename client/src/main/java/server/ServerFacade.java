@@ -2,16 +2,20 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.GameData;
 import service.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Objects;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    Gson gson = new Gson();
 
 
     public ServerFacade(String url){
@@ -24,12 +28,10 @@ public class ServerFacade {
         System.out.println("register response code: " + response.statusCode());
         if(!isSuccessful(response.statusCode())){
             if(response.statusCode() == 403){
-                System.out.println("Error " + response.statusCode());
-                System.out.println("\"message\"  \"Error: username already taken\"");
+                System.out.println("Error " + response.statusCode() + ": message:  \"Error: username already taken\"");
             }
             else if(response.statusCode() == 400){
-                System.out.println("Error " + response.statusCode());
-                System.out.println("\"message\"  \"Error: bad request\"");
+                error400();
             }
             return null;
         }
@@ -41,12 +43,10 @@ public class ServerFacade {
         System.out.println("login response code: " + response.statusCode());
         if(!isSuccessful(response.statusCode())){
             if(response.statusCode() == 401){
-                System.out.println("Error " + response.statusCode());
-                System.out.println("\"message\"  \"Error: unauthorized\"");
+                error401();
             }
             else if(response.statusCode() == 400){
-                System.out.println("Error " + response.statusCode());
-                System.out.println("\"message\"  \"Error: bad request\"");
+                error400();
             }
             return null;
         }
@@ -58,7 +58,7 @@ public class ServerFacade {
         System.out.println("logout response code: " + response.statusCode());
         return isSuccessful(response.statusCode());
     }
-    public ListGamesResult listGames(String authToken) throws ResponseException {
+    public List<ListGamesResult> listGames(String authToken) throws ResponseException {
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
         System.out.println("ListGames response:" + response.body());
@@ -66,7 +66,9 @@ public class ServerFacade {
             return null;
         }
         else{
-            return handleResponse(response, ListGamesResult.class);
+            var result = handleResponse(response, ListGamesResponse.class);
+            assert result != null;
+            return result.games();
         }
     }
     public boolean createGame(CreateGameRequest createGameRequest, String authToken) throws ResponseException {
@@ -76,10 +78,26 @@ public class ServerFacade {
         return isSuccessful(response.statusCode());
 
     }
-    public boolean joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
+    public GameData joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
         var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
         var response = sendRequest(request);
-        return isSuccessful(response.statusCode());
+        if(!isSuccessful(response.statusCode())){
+            if(response.statusCode() == 401){
+                error401();
+            }
+            else if(response.statusCode() == 400){
+                error400();
+            }
+            else if(response.statusCode() == 403){
+                System.out.println("Error 403: message:  \"Error: already taken\"");
+            }
+        }
+        if(isSuccessful(response.statusCode())){
+            return gson.fromJson(response.body(), GameData.class);
+        }
+        else{
+            return null;
+        }
     }
     public boolean clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
@@ -105,6 +123,13 @@ public class ServerFacade {
         }
 
         return builder.build();
+    }
+
+    public void error401(){
+        System.out.println("Error 401: message:  \"Error: unauthorized\"");
+    }
+    public void error400(){
+        System.out.println("Error 400: message:  \"Error: bad request\"");
     }
 
 //    private HttpRequest buildRequest(String method, String path, Object body) {

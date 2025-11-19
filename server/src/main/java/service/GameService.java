@@ -38,36 +38,41 @@ public class GameService {
         return listGamesResults;
     }
 
-    public boolean joinGame(String username, String playerColor, int gameID){
+    public GameData joinGame(String username, String playerColor, int gameID){
         GameData curGame = gameDAO.getGame(gameID);
         if(curGame == null){
-            return false;
+            return null;
         }
-//        System.out.println("Current white player:" + curGame.whiteUsername());
-//        System.out.println("Current black player:" + curGame.blackUsername());
         if(Objects.equals(playerColor, "WHITE")){
             if(curGame.whiteUsername() != null){
-                return false;
+                if(Objects.equals(username, curGame.whiteUsername())){
+                    return curGame;
+                }
+                else{
+                    return null;
+                }
             }
             else{
                 GameData updatedGame = new GameData(curGame.gameID(), username, curGame.blackUsername(), curGame.gameName(), curGame.game());
                 gameDAO.updateGame(gameID, updatedGame);
-                return true;
+                return updatedGame;
             }
         }
         else if(Objects.equals(playerColor, "BLACK")){
             if(curGame.blackUsername() != null){
-                return false;
+                if(Objects.equals(username, curGame.blackUsername())){
+                    return curGame;
+                }
             }
             else{
-//                System.out.println("Attempting to update game");
                 GameData updatedGame = new GameData(curGame.gameID(), curGame.whiteUsername(), username, curGame.gameName(), curGame.game());
                 gameDAO.updateGame(gameID, updatedGame);
-                return true;
+                return updatedGame;
             }
         }
         else{
-            return false;
+            return null;
         }
+        return null;
     }
 }

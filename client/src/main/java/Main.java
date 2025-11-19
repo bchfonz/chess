@@ -54,7 +54,7 @@ public class Main {
                         if(response != null) {
                             if (response.authToken().length() > 10) {
                                 System.out.println("Logged in as " + response.username());
-                                exit = postLoginUI.postLogin();
+                                exit = postLoginUI.postLogin(response.authToken());
                             }
                         }
 
@@ -74,7 +74,7 @@ public class Main {
                         if(response != null) {
                             if (response.authToken().length() > 10) {
                                 System.out.println("Logged in as " + response.username());
-                                exit = postLoginUI.postLogin();
+                                exit = postLoginUI.postLogin(response.authToken());
                             }
                         }
 

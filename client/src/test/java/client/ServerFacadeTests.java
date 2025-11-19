@@ -127,14 +127,12 @@ public class ServerFacadeTests {
     @Order(11)
     @Test
     void validJoinGame() throws Exception {
-        boolean joined = facade.joinGame(new JoinGameRequest("BLACK", 1), mainAuth.authToken());
-        assertTrue(joined);
+        assertNotNull(facade.joinGame(new JoinGameRequest("BLACK", 1), mainAuth.authToken()));
     }
     @Order(11)
     @Test
     void invalidJoinGame() throws Exception {
-        boolean joined = facade.joinGame(new JoinGameRequest("YELLOW", 1), mainAuth.authToken());
-        assertFalse(joined);
+        assertNull(facade.joinGame(new JoinGameRequest("YELLOW", 1), mainAuth.authToken()));
     }
 
     @Order(12)

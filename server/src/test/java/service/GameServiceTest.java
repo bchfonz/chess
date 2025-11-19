@@ -65,7 +65,7 @@ public class GameServiceTest {
     public void validJoinGame(){
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "My first new game :)");
         int createGameResult = gameService.createGame(createGameRequest);
-        Assertions.assertTrue(gameService.joinGame(username, "BLACK", createGameResult), "Should return true for successful join");
+        Assertions.assertNotNull(gameService.joinGame(username, "BLACK", createGameResult), "Should return the game for successful join");
     }
 
     @Test
@@ -73,7 +73,7 @@ public class GameServiceTest {
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "My first new game :)");
         int createGameResult = gameService.createGame(createGameRequest);
         gameService.joinGame("Random User", "BLACK", createGameResult);
-        Assertions.assertFalse(gameService.joinGame(username, "BLACK", createGameResult), "Should return true for successful join");
+        Assertions.assertNull(gameService.joinGame(username, "BLACK", createGameResult), "Should return the game for successful join");
 
     }
 

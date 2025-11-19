@@ -6,6 +6,7 @@ import dataaccess.DatabaseManager;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
@@ -48,12 +49,14 @@ public class JoinGameHandler implements Handler {
                 ctx.status(400);
                 ctx.json(gson.toJson(Map.of("message", "Error: bad request")));
             }
-            else if(!gameServiceObj.joinGame(authData.username(), joinGameRequest.playerColor(), joinGameRequest.gameID())){
+            else if(gameServiceObj.joinGame(authData.username(), joinGameRequest.playerColor(), joinGameRequest.gameID()) == null){
                 ctx.status(403);
                 ctx.json(gson.toJson(Map.of("message", "Error: already taken")));
             }
             else{
                 ctx.status(200);
+                GameData gameToJoin = gameServiceObj.joinGame(authData.username(), joinGameRequest.playerColor(), joinGameRequest.gameID());
+                ctx.json(gson.toJson(gameToJoin));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
