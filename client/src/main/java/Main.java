@@ -1,12 +1,10 @@
 import chess.*;
 import exception.ResponseException;
-import server.Server;
 import service.LoginRequest;
 import service.RegisterRequest;
 import server.ServerFacade;
 import ui.PostLoginUI;
 
-import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
