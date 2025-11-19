@@ -38,9 +38,6 @@ public class SqlUserDAO implements UserDAO{
     public void addUser(UserData newUser) {
         String addUserStmt = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         int id = executeUpdate(addUserStmt, newUser.username(), newUser.password(), newUser.email());
-        if(id == 0){
-//            System.out.println("User not added");
-        }
     }
 
     @Override
@@ -84,7 +81,6 @@ public class SqlUserDAO implements UserDAO{
 
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 if (result.next()) {
-//                    System.out.println("Successfully added user to database");
                     return result.getInt(1);
                 }
                 return 0;

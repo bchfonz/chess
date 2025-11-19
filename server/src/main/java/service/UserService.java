@@ -43,7 +43,6 @@ public class UserService {
             UserData userData = userDAO.getUser(username);
             RegAndLoginResult loginResult;
             if(userData == null){
-//                System.out.println("User not found");
                 return null;
             }
             String hashedPassword = userData.password();
@@ -53,7 +52,6 @@ public class UserService {
                 loginResult = new RegAndLoginResult(username, loginAuth.authToken());
                 return loginResult;
             } else {
-//                System.out.println("Passwords didn't match");
                 return null;
             }
         } catch (DataAccessException e) {
@@ -63,11 +61,9 @@ public class UserService {
     public boolean logout(LogoutRequest logoutRequest) {
         try{
             if(authDAO.getAuth(logoutRequest.authToken()) == null){
-//                System.out.println("AuthToken didn't exist");
                 return false;
             }
             else{
-//                System.out.println("Authoken was found. Deleting now");
                 authDAO.deleteAuth(logoutRequest.authToken());
                 return true;
             }

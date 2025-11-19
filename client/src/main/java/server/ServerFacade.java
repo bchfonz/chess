@@ -25,10 +25,9 @@ public class ServerFacade {
     public RegAndLoginResult register(RegisterRequest regRequest) throws ResponseException {
         var request = buildRequest("POST", "/user", regRequest, null);
         var response = sendRequest(request);
-        System.out.println("register response code: " + response.statusCode());
         if(!isSuccessful(response.statusCode())){
             if(response.statusCode() == 403){
-                System.out.println("Error " + response.statusCode() + ": message:  \"Error: username already taken\"");
+                System.out.println("That username is already taken");
             }
             else if(response.statusCode() == 400){
                 error400();
@@ -40,7 +39,6 @@ public class ServerFacade {
     public RegAndLoginResult login(LoginRequest loginRequest) throws ResponseException {
         var request = buildRequest("POST", "/session", loginRequest, null);
         var response = sendRequest(request);
-        System.out.println("login response code: " + response.statusCode());
         if(!isSuccessful(response.statusCode())){
             if(response.statusCode() == 401){
                 error401();
@@ -55,13 +53,11 @@ public class ServerFacade {
     public boolean logout(LogoutRequest logoutRequest) throws ResponseException {
         var request = buildRequest("DELETE", "/session", null, logoutRequest.authToken());
         var response = sendRequest(request);
-        System.out.println("logout response code: " + response.statusCode());
         return isSuccessful(response.statusCode());
     }
     public List<ListGamesResult> listGames(String authToken) throws ResponseException {
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
-        System.out.println("ListGames response:" + response.body());
         if(!isSuccessful(response.statusCode())){
             return null;
         }
@@ -74,7 +70,6 @@ public class ServerFacade {
     public boolean createGame(CreateGameRequest createGameRequest, String authToken) throws ResponseException {
         var request = buildRequest("POST", "/game", createGameRequest, authToken);
         var response = sendRequest(request);
-        System.out.println("createGame response code: " + response.statusCode());
         return isSuccessful(response.statusCode());
 
     }
@@ -89,7 +84,7 @@ public class ServerFacade {
                 error400();
             }
             else if(response.statusCode() == 403){
-                System.out.println("Error 403: message:  \"Error: already taken\"");
+                System.out.println("Cannot join game. " + joinGameRequest.playerColor() + " team already taken");
             }
         }
         if(isSuccessful(response.statusCode())){
@@ -100,10 +95,6 @@ public class ServerFacade {
         }
     }
 
-//    public GameData observeGame(int id, String authToken) throws ResponseException {
-//        var request = buildRequest("GET", "/game", id, authToken);
-//        var resonse = sendRequest(request);
-//    }
     public boolean clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
         var response = sendRequest(request);
@@ -131,34 +122,11 @@ public class ServerFacade {
     }
 
     public void error401(){
-        System.out.println("Error 401: message:  \"Error: unauthorized\"");
+        System.out.println("Invalid username or password");
     }
     public void error400(){
-        System.out.println("Error 400: message:  \"Error: bad request\"");
+        System.out.println("Invalid command. Type \"help\" for a list of commands. Commands are case sensitive");
     }
-
-//    private HttpRequest buildRequest(String method, String path, Object body) {
-//        var request = HttpRequest.newBuilder()
-//                .uri(URI.create(serverUrl + path))
-//                .method(method, makeRequestBody(body));
-//        if (body != null) {
-//            request.setHeader("Content-Type", "application/json");
-//        }
-//        return request.build();
-//    }
-//
-//    // Header-only request (no JSON body)
-//    private HttpRequest buildRequest(String method, String path, String authToken) {
-//        var request = HttpRequest.newBuilder()
-//                .uri(URI.create(serverUrl + path))
-//                .method(method, HttpRequest.BodyPublishers.noBody());
-//
-//        if (authToken != null) {
-//            request.setHeader("authorization", authToken);
-//        }
-//
-//        return request.build();
-//    }
 
     private HttpRequest.BodyPublisher makeRequestBody(Object request) {
         if (request != null) {

@@ -37,7 +37,6 @@ public class LoginHandler implements Handler {
         LoginRequest user = gson.fromJson(ctx.body(), LoginRequest.class);
         RegAndLoginResult loginResult = userServiceObj.login(user);
         if(user.username() == null || user.password() == null){
-            System.out.println("In bad requests");
             ctx.status(400);
             ctx.json(gson.toJson(Map.of("message", "Error: bad request")));
         }

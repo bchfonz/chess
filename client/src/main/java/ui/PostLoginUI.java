@@ -35,6 +35,7 @@ public class PostLoginUI {
 
             switch (input) {
                 case "help" -> {
+                    System.out.println("List of commands: (Commands are case sensitive)");
                     System.out.println("create <NAME> - a game");
                     System.out.println("list - games");
                     System.out.println("join <ID> [WHITE|BLACK] - a game");
@@ -45,6 +46,11 @@ public class PostLoginUI {
                     System.out.println("help - with possible commands");
                 }
                 case "create" -> {
+                    if(!validNumArgs(2, inputs.length)){
+                        System.out.println("Invalid number of arguments");
+                        System.out.println("Game names can't have a space");
+                        continue;
+                    }
                     String gameName = inputs[1];
                     CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
                     facade.createGame(createGameRequest, authToken);
@@ -76,36 +82,43 @@ public class PostLoginUI {
                     }
                 }
                 case "join" -> {
+                    if(!validNumArgs(3, inputs.length)){
+                        System.out.println("Invalid number of arguments");
+                        continue;
+                    }
                     String team = inputs[2];
                     int id = Integer.parseInt(inputs[1]);
+                    if(gameMap.get(id) == null){
+                        System.out.println("Invalid game ID");
+                        continue;
+                    }
                     int gameID = gameMap.get(id);
                     JoinGameRequest joinGameRequest = new JoinGameRequest(team, gameID);
                     GameData gameData = facade.joinGame(joinGameRequest, authToken);
                     if(gameData != null){
-                        System.out.println("Joined game");
+                        System.out.println("Joined " + gameData.gameName());
                         gameplayUI.joinGame(gameData, team);
-                    }
-                    else{
-                        System.out.println("Unable to join game");
                     }
                 }
                 case "observe" -> {
+                    if(!validNumArgs(2, inputs.length)){
+                        System.out.println("Invalid number of arguments");
+                        continue;
+                    }
                     int id = Integer.parseInt(inputs[1]);
                     int gameID = 0;
                     if(gameMap.get(id) == null){
                         System.out.println("Invalid game ID");
+                        continue;
+                    }
+                    gameID = gameMap.get(id);
+                    GameData game = new SqlGameDAO().getGame(gameID);
+                    if(game == null){
+                        System.out.println("Invalid game ID");
                     }
                     else{
-                        gameID = gameMap.get(id);
-                        GameData game = new SqlGameDAO().getGame(gameID);
-                        if(game == null){
-                            System.out.println("Invalid game ID");
-                        }
-                        else{
-                            gameplayUI.observeGame(game);
-                        }
+                        gameplayUI.observeGame(game);
                     }
-
 
                 }
                 case "logout" -> {
@@ -116,10 +129,24 @@ public class PostLoginUI {
                     exit = true;
                     quit = true;
                 }
-                default -> System.out.println("Unknown command. Type 'help' for a list of commands.");
+                default ->{
+                    System.out.println("Unknown command. Commands:");
+                    System.out.println("create <NAME> - a game");
+                    System.out.println("list - games");
+                    System.out.println("join <ID> [WHITE|BLACK] - a game");
+                    System.out.println("play <ID> - a game");
+                    System.out.println("observe <ID> - a game");
+                    System.out.println("logout - when you are done");
+                    System.out.println("quit - playing chess");
+                    System.out.println("help - with possible commands");
+                }
             }
         }
         return quit;
+    }
+
+    private boolean validNumArgs(int expected, int actual){
+        return expected == actual;
     }
 
     public HashMap<Integer, Integer> gameListHelper(String authToken) throws ResponseException {

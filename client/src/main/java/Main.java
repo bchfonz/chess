@@ -36,22 +36,26 @@ public class Main {
             String line = scanner.nextLine();
             var inputs = line.split(" ");
             var input = inputs[0];
-
             switch (input) {
                 case "help" -> {
+                    System.out.println("List of commands: (Commands are case sensitive)");
                     System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
                     System.out.println("login <USERNAME> <PASSWORD> - to play chess");
                     System.out.println("quit - playing chess");
                     System.out.println("help - with possible commands");
                 }
                 case "register" -> {
+                    if(!validNumArgs(4, inputs.length)){
+                        System.out.println("Invalid number of arguments");
+                        continue;
+                    }
                     String username = inputs[1];
-                    String password= inputs[2];
+                    String password = inputs[2];
                     String email = inputs[3];
                     RegisterRequest registerRequest = new RegisterRequest(username, password, email);
                     try {
                         var response = facade.register(registerRequest);
-                        if(response != null) {
+                        if (response != null) {
                             if (response.authToken().length() > 10) {
                                 System.out.println("Logged in as " + response.username());
                                 exit = postLoginUI.postLogin(response.authToken());
@@ -59,13 +63,15 @@ public class Main {
                         }
 
                     } catch (ResponseException e) {
-//                        System.out.println("In response excepti");
-//                        System.out.println("Exception e: " + e);
                         throw new RuntimeException(e);
                     }
+
                 }
                 case "login" -> {
-                    System.out.println("In Login");
+                    if(!validNumArgs(3, inputs.length)){
+                        System.out.println("Invalid number of arguments");
+                        continue;
+                    }
                     String username = inputs[1];
                     String password= inputs[2];
                     LoginRequest loginRequest = new LoginRequest(username, password);
@@ -79,17 +85,14 @@ public class Main {
                         }
 
                     } catch (ResponseException e) {
-//                        System.out.println("In response excepti");
-//                        System.out.println("Exception e: " + e);
                         throw new RuntimeException(e);
                     }
                 }
                 case "quit" -> {
                     exit = true;
-//                    server.stop();
                 }
                 case null, default -> {
-                    System.out.println("Invalid input. Valid inputs:");
+                    System.out.println("Unknown command. Commands:");
                     System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
                     System.out.println("login <USERNAME> <PASSWORD> - to play chess");
                     System.out.println("quit - playing chess");
@@ -98,6 +101,9 @@ public class Main {
             }
         }
         System.out.println("Thanks for playing!");
-
     }
+    public static boolean validNumArgs(int expected, int actual){
+        return expected == actual;
+    }
+
 }
