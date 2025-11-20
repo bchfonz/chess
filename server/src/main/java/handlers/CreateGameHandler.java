@@ -6,7 +6,7 @@ import dataaccess.DatabaseManager;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
-import service.CreateGameRequest;
+import server.CreateGameRequest;
 import service.GameService;
 import service.UserService;
 

@@ -1,17 +1,9 @@
 package client;
 
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
 import exception.ResponseException;
 import org.junit.jupiter.api.*;
-import server.Server;
-import server.ServerFacade;
+import server.*;
 import service.*;
-
-import javax.xml.crypto.Data;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

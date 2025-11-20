@@ -10,12 +10,12 @@ import java.util.Objects;
 
 public class GameplayUI {
 
-    public void observeGame(GameData game){
-        System.out.println("Now observing " + game.gameName());
+    public void observeGame(){
+        ChessGame game = new ChessGame();
         boardWhite(game);
     }
 
-    public void joinGame(GameData game, String team){
+    public void joinGame(ChessGame game, String team){
         if(Objects.equals(team, "WHITE")){
             boardWhite(game);
         }
@@ -25,8 +25,8 @@ public class GameplayUI {
 
     }
 
-    private void boardBlack(GameData game){
-        ChessBoard board = game.game().getBoard();
+    private void boardBlack(ChessGame game){
+        ChessBoard board = game.getBoard();
         System.out.print(EscapeSequences.ERASE_SCREEN);
 
         // --- Print top border with file labels (a-h)
@@ -92,8 +92,8 @@ public class GameplayUI {
         System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
     }
 
-    private void boardWhite(GameData game){
-        ChessBoard board = game.game().getBoard();
+    private void boardWhite(ChessGame game){
+        ChessBoard board = game.getBoard();
         System.out.print(EscapeSequences.ERASE_SCREEN);
 
 // --- Print top border with file labels (h–a for Black’s view)

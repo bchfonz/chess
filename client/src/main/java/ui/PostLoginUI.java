@@ -4,11 +4,10 @@ import dataaccess.SqlGameDAO;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
-import service.CreateGameRequest;
-import service.JoinGameRequest;
-import service.ListGamesResult;
+import server.CreateGameRequest;
+import server.JoinGameRequest;
+import server.ListGamesResult;
 
-import java.net.CacheResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -97,7 +96,7 @@ public class PostLoginUI {
                     GameData gameData = facade.joinGame(joinGameRequest, authToken);
                     if(gameData != null){
                         System.out.println("Joined " + gameData.gameName());
-                        gameplayUI.joinGame(gameData, team);
+                        gameplayUI.joinGame(gameData.game(), team);
                     }
                 }
                 case "observe" -> {
@@ -117,7 +116,7 @@ public class PostLoginUI {
                         System.out.println("Invalid game ID");
                     }
                     else{
-                        gameplayUI.observeGame(game);
+                        gameplayUI.observeGame();
                     }
 
                 }

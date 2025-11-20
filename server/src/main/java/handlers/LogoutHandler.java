@@ -6,7 +6,7 @@ import dataaccess.DatabaseManager;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
-import service.LogoutRequest;
+import server.LogoutRequest;
 import service.UserService;
 
 import java.sql.Connection;

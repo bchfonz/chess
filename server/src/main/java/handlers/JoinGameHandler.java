@@ -7,16 +7,13 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
-import service.JoinGameRequest;
-import service.ListGamesResult;
+import server.JoinGameRequest;
 import service.UserService;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 public class JoinGameHandler implements Handler {

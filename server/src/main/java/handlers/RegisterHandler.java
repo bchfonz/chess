@@ -4,8 +4,8 @@ import dataaccess.DatabaseManager;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import service.RegAndLoginResult;
-import service.RegisterRequest;
+import server.RegAndLoginResult;
+import server.RegisterRequest;
 import service.UserService;
 
 import java.sql.Connection;

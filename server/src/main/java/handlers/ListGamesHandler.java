@@ -3,13 +3,11 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
-import dataaccess.GameDAO;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import model.GameData;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
-import service.ListGamesResult;
+import server.ListGamesResult;
 import service.UserService;
 
 import java.sql.Connection;

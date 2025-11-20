@@ -1,7 +1,6 @@
-import chess.*;
 import exception.ResponseException;
-import service.LoginRequest;
-import service.RegisterRequest;
+import server.LoginRequest;
+import server.RegisterRequest;
 import server.ServerFacade;
 import ui.PostLoginUI;
 

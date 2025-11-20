@@ -5,11 +5,9 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import model.UserData;
 import org.jetbrains.annotations.NotNull;
-import service.LoginRequest;
-import service.RegAndLoginResult;
-import service.RegisterRequest;
+import server.LoginRequest;
+import server.RegAndLoginResult;
 import service.UserService;
 
 import java.sql.Connection;

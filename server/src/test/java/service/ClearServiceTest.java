@@ -4,6 +4,8 @@ import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import server.CreateGameRequest;
+import server.RegisterRequest;
 
 public class ClearServiceTest {
     private static GameService gameService;

@@ -3,10 +3,11 @@ package service;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import javax.xml.crypto.Data;
+import server.LoginRequest;
+import server.LogoutRequest;
+import server.RegAndLoginResult;
+import server.RegisterRequest;
 
 public class UserServiceTest {
 

@@ -1,9 +1,10 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.LocalGameDB;
 import dataaccess.SqlGameDAO;
 import model.GameData;
+import server.CreateGameRequest;
+import server.ListGamesResult;
 
 import java.util.*;
 

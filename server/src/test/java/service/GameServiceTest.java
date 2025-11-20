@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.CreateGameRequest;
+import server.RegAndLoginResult;
+import server.RegisterRequest;
 
 public class GameServiceTest {
     private static GameService gameService;
