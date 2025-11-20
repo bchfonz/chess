@@ -19,7 +19,7 @@ public class Main {
         postLoginUI = new PostLoginUI(facade);
     }
 //    private static ServerFacade serverFacadeObj = new ServerFacade();
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ResponseException {
         Main.init();
 //        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         for (var i = 0; i < args.length; i++) {
@@ -50,18 +50,15 @@ public class Main {
                     String password = inputs[2];
                     String email = inputs[3];
                     RegisterRequest registerRequest = new RegisterRequest(username, password, email);
-                    try {
-                        var response = facade.register(registerRequest);
-                        if (response != null) {
-                            if (response.authToken().length() > 10) {
-                                System.out.println("Logged in as " + response.username());
-                                exit = postLoginUI.postLogin(response.authToken());
-                            }
-                        }
-
-                    } catch (ResponseException e) {
-                        throw new RuntimeException(e);
+                    var response = facade.register(registerRequest);
+                    if (response == null) {
+                        continue;
                     }
+                    if (response.authToken().length() > 10) {
+                        System.out.println("Logged in as " + response.username());
+                        exit = postLoginUI.postLogin(response.authToken());
+                    }
+
 
                 }
                 case "login" -> {
@@ -72,17 +69,13 @@ public class Main {
                     String username = inputs[1];
                     String password= inputs[2];
                     LoginRequest loginRequest = new LoginRequest(username, password);
-                    try {
-                        var response = facade.login(loginRequest);
-                        if(response != null) {
-                            if (response.authToken().length() > 10) {
-                                System.out.println("Logged in as " + response.username());
-                                exit = postLoginUI.postLogin(response.authToken());
-                            }
-                        }
-
-                    } catch (ResponseException e) {
-                        throw new RuntimeException(e);
+                    var response = facade.login(loginRequest);
+                    if(response == null) {
+                        continue;
+                    }
+                    if (response.authToken().length() > 10) {
+                        System.out.println("Logged in as " + response.username());
+                        exit = postLoginUI.postLogin(response.authToken());
                     }
                 }
                 case "quit" -> {
