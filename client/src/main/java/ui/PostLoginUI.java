@@ -22,15 +22,12 @@ public class PostLoginUI {
         boolean exit = false;
         boolean quit = false;
         HashMap<Integer, Integer> gameMap = gameListHelper(authToken);
-
         while(!exit){
-
             System.out.print("[LOGGED_IN] >>> ");
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             var inputs = line.split(" ");
             var input = inputs[0];
-
             switch (input) {
                 case "help" -> {
                     System.out.println("List of commands: (Commands are case sensitive)");
@@ -94,12 +91,6 @@ public class PostLoginUI {
                 case "observe" -> {
                     if(!validNumArgs(2, inputs.length)){
                         System.out.println("Invalid number of arguments");
-                        continue;
-                    }
-                    int id = Integer.parseInt(inputs[1]);
-                    int gameID = 0;
-                    if(gameMap.get(id) == null){
-                        System.out.println("Invalid game ID");
                         continue;
                     }
                     else{
