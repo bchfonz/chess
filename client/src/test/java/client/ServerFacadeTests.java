@@ -24,12 +24,6 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade(String.format("http://localhost:%d", port));
         mainAuth = facade.register(new RegisterRequest( "mainUser", "mainPassword", "main@email.com"));
-//        System.out.println("AUTHTOKEN: " + mainAuth.authToken());
-//        try{
-//            mainAuth = facade.register(new RegisterRequest( "mainUser", "mainPassword", "main@email.com"));
-//        } catch (ResponseException e) {
-//            throw new RuntimeException(e);
-//        }
 
     }
 
@@ -49,10 +43,7 @@ public class ServerFacadeTests {
     @Order(2)
     @Test
     void duplicateRegister() throws ResponseException {
-//        facade.register(new RegisterRequest("sameUser", "password", "user@email.com"));
-
-        assertThrows(Exception.class, () ->
-            facade.register(new RegisterRequest("user", "sameUsername", "user@email.com")));
+        assertNull(facade.register(new RegisterRequest("mainUser", "sameUsername", "user@email.com")));
     }
 
     @Order(3)
@@ -65,8 +56,7 @@ public class ServerFacadeTests {
     @Order(4)
     @Test
     void invalidLogin() throws Exception {
-        assertThrows(Exception.class, () ->
-                facade.login(new LoginRequest("user", "wrongPassword")));
+        assertNull(facade.login(new LoginRequest("user", "wrongPassword")));
     }
 
     @Order(5)

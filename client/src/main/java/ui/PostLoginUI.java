@@ -34,14 +34,7 @@ public class PostLoginUI {
             switch (input) {
                 case "help" -> {
                     System.out.println("List of commands: (Commands are case sensitive)");
-                    System.out.println("create <NAME> - a game");
-                    System.out.println("list - games");
-                    System.out.println("join <ID> [WHITE|BLACK] - a game");
-                    System.out.println("play <ID> - a game");
-                    System.out.println("observe <ID> - a game");
-                    System.out.println("logout - when you are done");
-                    System.out.println("quit - playing chess");
-                    System.out.println("help - with possible commands");
+                    commandList();
                 }
                 case "create" -> {
                     if(!validNumArgs(2, inputs.length)){
@@ -124,18 +117,22 @@ public class PostLoginUI {
                 }
                 default ->{
                     System.out.println("Unknown command. Commands:");
-                    System.out.println("create <NAME> - a game");
-                    System.out.println("list - games");
-                    System.out.println("join <ID> [WHITE|BLACK] - a game");
-                    System.out.println("play <ID> - a game");
-                    System.out.println("observe <ID> - a game");
-                    System.out.println("logout - when you are done");
-                    System.out.println("quit - playing chess");
-                    System.out.println("help - with possible commands");
+                    commandList();
                 }
             }
         }
         return quit;
+    }
+
+    private void commandList() {
+        System.out.println("create <NAME> - a game");
+        System.out.println("list - games");
+        System.out.println("join <ID> [WHITE|BLACK] - a game");
+        System.out.println("play <ID> - a game");
+        System.out.println("observe <ID> - a game");
+        System.out.println("logout - when you are done");
+        System.out.println("quit - playing chess");
+        System.out.println("help - with possible commands");
     }
 
     private boolean validNumArgs(int expected, int actual){

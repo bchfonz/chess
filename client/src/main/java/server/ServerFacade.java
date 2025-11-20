@@ -126,14 +126,6 @@ public class ServerFacade {
         System.out.println("Invalid command. Type \"help\" for a list of commands. Commands are case sensitive");
     }
 
-    private HttpRequest.BodyPublisher makeRequestBody(Object request) {
-        if (request != null) {
-            return HttpRequest.BodyPublishers.ofString(new Gson().toJson(request));
-        } else {
-            return HttpRequest.BodyPublishers.noBody();
-        }
-    }
-
     private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
