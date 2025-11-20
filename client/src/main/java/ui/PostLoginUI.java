@@ -50,20 +50,8 @@ public class PostLoginUI {
                     List<ListGamesResult> games = facade.listGames(authToken);
                     System.out.println("Game list:");
                     for(ListGamesResult game : games){
-                        String whiteUsername;
-                        if(game.whiteUsername() == null){
-                            whiteUsername = "empty";
-                        }
-                        else{
-                            whiteUsername = game.whiteUsername();
-                        }
-                        String blackUsername;
-                        if(game.blackUsername() == null){
-                            blackUsername = "empty";
-                        }
-                        else{
-                            blackUsername = game.blackUsername();
-                        }
+                        String whiteUsername = (game.whiteUsername() == null) ? "empty" : game.whiteUsername();
+                        String blackUsername = (game.blackUsername() == null) ? "empty" : game.blackUsername();
                         System.out.println(i +". " + game.gameName() + ", White player: " + whiteUsername + ", Black player: " + blackUsername);
                         gameMap.put(i, game.gameID());
                         i++;
