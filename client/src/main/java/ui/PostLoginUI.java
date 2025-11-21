@@ -63,6 +63,10 @@ public class PostLoginUI {
                         continue;
                     }
                     String team = inputs[2];
+                    if(!numFromString(inputs[1])){
+                        System.out.println("Invalid command. A number is expected after \"join\"");
+                        continue;
+                    }
                     int id = Integer.parseInt(inputs[1]);
                     if(gameMap.get(id) == null){
                         System.out.println("Invalid game ID");
@@ -80,6 +84,14 @@ public class PostLoginUI {
                     if(!validNumArgs(2, inputs.length)){
                         System.out.println("Invalid number of arguments");
                         continue;
+                    }
+                    if(!numFromString(inputs[1])){
+                        System.out.println("Invalid command. A number is expected after \"observe\"");
+                        continue;
+                    }
+                    int id = Integer.parseInt(inputs[1]);
+                    if(id > gameMap.size()){
+                        System.out.println("Invalid ID");
                     }
                     else{
                         gameplayUI.observeGame();
@@ -107,7 +119,6 @@ public class PostLoginUI {
         System.out.println("create <NAME> - a game");
         System.out.println("list - games");
         System.out.println("join <ID> [WHITE|BLACK] - a game");
-        System.out.println("play <ID> - a game");
         System.out.println("observe <ID> - a game");
         System.out.println("logout - when you are done");
         System.out.println("quit - playing chess");
@@ -128,4 +139,17 @@ public class PostLoginUI {
         }
         return tempGameMap;
     }
+
+    private boolean numFromString(String input) {
+        if (input == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 }
