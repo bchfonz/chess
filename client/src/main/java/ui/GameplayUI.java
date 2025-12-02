@@ -66,14 +66,14 @@ public class GameplayUI {
                     String startPos = inputs[1];
                     String endPos = inputs[2];
                     char startPosLetter = startPos.charAt(0);
-                    int startPosRow = letterToNumber(startPosLetter);
-                    int startPosCol = Character.getNumericValue(startPos.charAt(1));
+                    int startPosCol = letterToNumber(startPosLetter);
+                    int startPosRow = Character.getNumericValue(startPos.charAt(1));
                     char endPosLetter = endPos.charAt(0);
-                    int endPosRow = letterToNumber(endPosLetter);
-                    int endPosCol = Character.getNumericValue(endPos.charAt(1));
+                    int endPosCol = letterToNumber(endPosLetter);
+                    int endPosRow = Character.getNumericValue(endPos.charAt(1));
                     if(startPosRow > 8 || startPosRow < 1 || startPosCol > 8 || startPosCol < 1 ||
                             endPosRow > 8 || endPosRow < 1 || endPosCol > 8 || endPosCol < 1){
-                        System.out.println("Invalid position. Rows must be 1-8 and columns must be a-h l");
+                        System.out.println("Invalid position. Rows must be 1-8 and columns must be a-h");
                         continue;
                     }
                     ChessMove move = createMove(startPosRow, startPosCol, endPosRow, endPosCol);

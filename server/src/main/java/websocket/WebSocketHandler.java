@@ -93,14 +93,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if(isPlayer){
             notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, joinedMessage);
             gameServiceObj.joinGame(playerName, team, gameID);
-            System.out.println("Test. Number of games:" + gameDAO.numOfGames());
-//            if(Objects.equals(team, "WHITE")) {
-//                updatedGame = new GameData(gameID, playerName, gameData.blackUsername(), gameData.gameName(), game);
-//            }
-//            else{
-//                updatedGame = new GameData(gameID, gameData.whiteUsername(), playerName, gameData.gameName(), game);
-//            }
-//            gameDAO.updateGame(gameID, updatedGame);
         } else {
             notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, observerMessage);
         }
@@ -122,8 +114,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else {
             try {
                 game.makeMove(move);
-                GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
-                gameDAO.updateGame(gameID, updatedGame);
+                GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+                gameDAO.updateGame(gameID, updatedGameData);
                 connections.loadGame(game);
                 String message = "Move made: " + move;
                 NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);

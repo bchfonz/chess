@@ -112,11 +112,14 @@ public class SqlGameDAO implements GameDAO{
         }
     }
 
-    public void updateGame(int gameID, GameData updatedGame){
+    public void updateGame(int gameID, GameData updatedGame) {
         String joinGameWhiteStatement = "UPDATE chessGames SET whiteUsername = ? WHERE gameID = ?";
         String joinGameBlackStatement = "UPDATE chessGames SET blackUsername = ? WHERE gameID = ?";
+        String updateBoardStatement = "UPDATE chessGames SET game = ? WHERE gameID = ?";
+        String chessGameJson = new Gson().toJson(updatedGame.game());
         executeUpdate(joinGameWhiteStatement, updatedGame.whiteUsername(), gameID);
         executeUpdate(joinGameBlackStatement, updatedGame.blackUsername(), gameID);
+        executeUpdate(updateBoardStatement, chessGameJson, gameID);
     }
 
     @Override
