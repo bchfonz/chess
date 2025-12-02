@@ -10,13 +10,14 @@ public class Main {
     static ServerFacade facade;
     static PostLoginUI postLoginUI;
 //    static Server server;
-    public static void init(){
+    public static void init() throws ResponseException {
 //        server = new Server();
 //        var port = server.run(0);
         int port = 8080;
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade(String.format("http://localhost:%d", port));
-        postLoginUI = new PostLoginUI(facade);
+        String url = String.format("http://localhost:%d", port);
+        facade = new ServerFacade(url);
+        postLoginUI = new PostLoginUI(facade, url);
     }
 //    private static ServerFacade serverFacadeObj = new ServerFacade();
     public static void main(String[] args) throws ResponseException {

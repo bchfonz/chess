@@ -17,40 +17,49 @@ import io.javalin.websocket.WsMessageHandler;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import server.Server;
+import service.GameService;
 import websocket.commands.*;
 import websocket.messages.*;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final Gson gson = new Gson();
     private final ConnectionManager connections = new ConnectionManager();
     private final SqlGameDAO gameDAO = new SqlGameDAO();
     private final SqlAuthDAO authDAO = new SqlAuthDAO();
+    private final GameService gameServiceObj = new GameService();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
         ctx.enableAutomaticPings();
-        ctx.send(gson.toJson("Connection established"));
+//        ctx.send(gson.toJson("Connection established"));
     }
 
     @Override
     public void handleMessage(WsMessageContext ctx) {
-        ctx.send(gson.toJson("Message received"));
+//        ctx.send(gson.toJson("Message received"));
         try {
             if(ctx.message().contains("MAKE_MOVE")){
                 MakeMoveCommand makeMoveCommand = gson.fromJson(ctx.message(), MakeMoveCommand.class);
                 ChessMove move = makeMoveCommand.getMove();
                 int gameID = makeMoveCommand.getGameID();
-                makeMove(gameID, move, ctx);
+                String authToken = makeMoveCommand.getAuthToken();
+                String username = authDAO.getAuth(authToken).username();
+                makeMove(gameID, move, username, ctx);
+            }
+            else if(ctx.message().contains("CONNECT")){
+                ConnectCommand connectCommand = gson.fromJson(ctx.message(), ConnectCommand.class);
+                String username = authDAO.getAuth(connectCommand.getAuthToken()).username();
+                connect(username, ctx.session, connectCommand.getGameID(), ctx, connectCommand.isPlayer(), connectCommand.getTeam());
             }
             else {
 //            ServerMessage serverMessage = gson.fromJson(ctx.message(), ServerMessage.class);
                 UserGameCommand userGameCommand = gson.fromJson(ctx.message(), UserGameCommand.class);
-                String username = authDAO.getAuth(userGameCommand.getAuthToken()).username();
+
                 switch (userGameCommand.getCommandType()) {
-                    case CONNECT -> connect(username, ctx.session, userGameCommand.getGameID(), ctx);
                     case LEAVE -> leave();
                     case RESIGN -> resign();
                 }
@@ -70,47 +79,74 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void connect(String visitorName, Session session, int gameID, WsMessageContext ctx) throws IOException {
+    private void connect(String playerName, Session session, int gameID, WsMessageContext ctx, boolean isPlayer, String team) throws IOException {
         connections.add(session);
-        System.out.println("In connect in WebSocketHandler");
-        String message = String.format("%s joined the game", visitorName);
-        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        ctx.send(gson.toJson("Connected to game " + gameID));
-        ChessGame game = gameDAO.getGame(gameID).game();
+        NotificationMessage notification;
+        GameData gameData = gameDAO.getGame(gameID);
+        ChessGame game = gameData.game();
+        GameData updatedGame;
+        System.out.println("isPlayer = " + isPlayer);
+        String joinedMessage = String.format("%s joined the game", playerName);
+        String observerMessage = String.format("%s is observing the game", playerName);
+        System.out.println("Test. Number of games:" + gameDAO.numOfGames());
+        //Checks for either observer or player
+        if(isPlayer){
+            notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, joinedMessage);
+            gameServiceObj.joinGame(playerName, team, gameID);
+            System.out.println("Test. Number of games:" + gameDAO.numOfGames());
+//            if(Objects.equals(team, "WHITE")) {
+//                updatedGame = new GameData(gameID, playerName, gameData.blackUsername(), gameData.gameName(), game);
+//            }
+//            else{
+//                updatedGame = new GameData(gameID, gameData.whiteUsername(), playerName, gameData.gameName(), game);
+//            }
+//            gameDAO.updateGame(gameID, updatedGame);
+        } else {
+            notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, observerMessage);
+        }
+
         LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-        ctx.send(loadGameMessage.toString() );
+        ctx.send(loadGameMessage.toString());
         connections.broadcast(session, notification);
     }
 
-    private void makeMove(Integer gameID, ChessMove move, WsMessageContext ctx) throws IOException {
+    private void makeMove(Integer gameID, ChessMove move, String username, WsMessageContext ctx) throws IOException {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
-        try{
-            game.makeMove(move);
-            GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
-            gameDAO.updateGame(gameID, updatedGame);
-            connections.loadGame(game);
-            String message = "Move made: " + move;
-            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(ctx.session, notification);
-            if(game.isInCheckmate(game.getTeamTurn())){
-                String checkmate = game.getTeamTurn() + " is in checkmate!";
-                NotificationMessage checkmateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkmate);
-                connections.broadcast(null, checkmateNotification);
+        boolean isWhiteTurn = Objects.equals(game.getTeamTurn(), ChessGame.TeamColor.WHITE);
+        boolean isPlayerWhite = Objects.equals(username, gameData.whiteUsername());
+        if(isWhiteTurn != isPlayerWhite){
+            String invalidTurn = "Not your turn!";
+            ctx.send(gson.toJson(invalidTurn));
+        }
+        else {
+            try {
+                game.makeMove(move);
+                GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+                gameDAO.updateGame(gameID, updatedGame);
+                connections.loadGame(game);
+                String message = "Move made: " + move;
+                NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(ctx.session, notification);
+                if (game.isInCheckmate(game.getTeamTurn())) {
+                    String checkmate = game.getTeamTurn() + " is in checkmate!";
+                    NotificationMessage checkmateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkmate);
+                    connections.broadcast(null, checkmateNotification);
+                }
+                if (game.isInCheck(game.getTeamTurn())) {
+                    String check = game.getTeamTurn() + " is in check!";
+                    NotificationMessage checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, check);
+                    connections.broadcast(null, checkNotification);
+                }
+                if (game.isInStalemate(game.getTeamTurn())) {
+                    String stalemate = "Game ended in stalemate!";
+                    NotificationMessage stalemateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stalemate);
+                    connections.broadcast(null, stalemateNotification);
+                }
+            } catch (InvalidMoveException e) {
+                System.out.println("Invalid move exception message: " + e.getMessage());
+                ctx.send(gson.toJson(e.getMessage()));
             }
-            if(game.isInCheck(game.getTeamTurn())){
-                String check = game.getTeamTurn() + " is in check!";
-                NotificationMessage checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, check);
-                connections.broadcast(null, checkNotification);
-            }
-            if(game.isInStalemate(game.getTeamTurn())){
-                String stalemate = "Game ended in stalemate!";
-                NotificationMessage stalemateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stalemate);
-                connections.broadcast(null, stalemateNotification);
-            }
-        } catch (InvalidMoveException e) {
-            System.out.println("Invalid move exception message: " + e.getMessage());
-            ctx.send(gson.toJson(e.getMessage()));
         }
 //        Validate move
 //        Update game to represent move
@@ -129,20 +165,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
 
-    private void leave(String visitorName, Session session) throws IOException {
-        var message = String.format("%s left the shop", visitorName);
+//    private void leave(String visitorName, Session session) throws IOException {
+//        var message = String.format("%s left the shop", visitorName);
 //        var notification = new Notification(Notification.Type.DEPARTURE, message);
 //        connections.broadcast(session, notification);
-        connections.remove(session);
-    }
-
-    public void makeMove(String petName, String sound) throws ResponseException {
-        try {
-            var message = String.format("%s says %s", petName, sound);
-//            var notification = new Notification(Notification.Type.NOISE, message);
-//            connections.broadcast(null, notification);
-        } catch (Exception ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
-    }
+//        connections.remove(session);
+//    }
 }

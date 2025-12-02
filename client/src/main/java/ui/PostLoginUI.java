@@ -6,6 +6,7 @@ import server.ServerFacade;
 import server.CreateGameRequest;
 import server.JoinGameRequest;
 import server.ListGamesResult;
+import websocket.WebSocketFacade;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +14,12 @@ import java.util.Scanner;
 
 public class PostLoginUI {
     ServerFacade facade;
-    GameplayUI gameplayUI = new GameplayUI();
-    public PostLoginUI(ServerFacade facade){
+    GameplayUI gameplayUI;
+    String url;
+    public PostLoginUI(ServerFacade facade, String url) throws ResponseException {
         this.facade = facade;
+        this.url = url;
+        this.gameplayUI = new GameplayUI(url);
     }
 
     public boolean postLogin(String authToken) throws ResponseException {
@@ -73,12 +77,7 @@ public class PostLoginUI {
                         continue;
                     }
                     int gameID = gameMap.get(id);
-                    JoinGameRequest joinGameRequest = new JoinGameRequest(team, gameID);
-                    GameData gameData = facade.joinGame(joinGameRequest, authToken);
-                    if(gameData != null){
-                        System.out.println("Joined " + gameData.gameName());
-                        gameplayUI.joinGame(gameData.game(), team);
-                    }
+                    gameplayUI.joinGame(authToken, gameID, team);
                 }
                 case "observe" -> {
                     if(!validNumArgs(2, inputs.length)){
@@ -92,11 +91,10 @@ public class PostLoginUI {
                     int id = Integer.parseInt(inputs[1]);
                     if(id > gameMap.size()){
                         System.out.println("Invalid ID");
+                        continue;
                     }
-                    else{
-                        gameplayUI.observeGame();
-                    }
-
+                    int gameID = gameMap.get(id);
+                    gameplayUI.observeGame(authToken, gameID);
                 }
                 case "logout" -> {
                     exit = true;
