@@ -84,11 +84,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         NotificationMessage notification;
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
-        GameData updatedGame;
         System.out.println("isPlayer = " + isPlayer);
         String joinedMessage = String.format("%s joined the game", playerName);
         String observerMessage = String.format("%s is observing the game", playerName);
-        System.out.println("Test. Number of games:" + gameDAO.numOfGames());
         //Checks for either observer or player
         if(isPlayer){
             notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, joinedMessage);

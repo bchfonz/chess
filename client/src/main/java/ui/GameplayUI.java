@@ -31,7 +31,6 @@ public class GameplayUI {
     }
 //
     public void joinGame(String authToken, int gameID, String team) throws ResponseException {
-        System.out.println("In joinGame");
         isPlayer = true;
         wsf.connect(ConnectCommand.CommandType.CONNECT, authToken, gameID, team, true);
         gameplay(authToken, gameID);

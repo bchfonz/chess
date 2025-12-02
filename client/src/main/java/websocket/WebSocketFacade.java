@@ -43,8 +43,12 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+//                    System.out.println("This is the message that was sent to my facade: " + message);
                     if(message.contains("NOTIFICATION")){
+//                        System.out.println("In notification handler");
                         NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+//                        System.out.println(notificationMessage);
+                        System.out.println(notificationMessage.getNotificationMessage());
                     }
                     if(message.contains("LOAD_GAME")){
                         //Handle load game message
@@ -72,7 +76,6 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void connect(UserGameCommand.CommandType commandType, String authToken, int gameID, String team, boolean isPlayer) throws ResponseException {
-        System.out.println("wsf isPlayer: " + isPlayer);
         try {
             ConnectCommand command = new ConnectCommand(commandType, authToken, gameID, isPlayer, team);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
