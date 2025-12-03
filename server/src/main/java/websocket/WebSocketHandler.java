@@ -58,9 +58,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             else {
 //            ServerMessage serverMessage = gson.fromJson(ctx.message(), ServerMessage.class);
                 UserGameCommand userGameCommand = gson.fromJson(ctx.message(), UserGameCommand.class);
-
+                String username = authDAO.getAuth(userGameCommand.getAuthToken()).username();
                 switch (userGameCommand.getCommandType()) {
-                    case LEAVE -> leave();
+                    case LEAVE -> leave(userGameCommand.getGameID(), username, ctx);
                     case RESIGN -> resign();
                 }
             }
@@ -136,7 +136,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     connections.broadcast(null, stalemateNotification);
                 }
             } catch (InvalidMoveException e) {
-//                System.out.println("Invalid move exception message: " + e.getMessage());
                 String errorMsg = "Invalid move: " + e.getMessage();
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMsg);
                 ctx.send(gson.toJson(errorMessage));
@@ -149,9 +148,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 //        If in check or checkmate send NOTIFICATION message to all clients
     }
 
-    private void leave(){
-//        Player is removed from game and game is updated
-//        Notification is sent to all other clients
+    private void leave(Integer gameID, String username, WsMessageContext ctx) throws IOException {
+        GameData gameData = gameDAO.getGame(gameID);
+        GameData updatedGameData;
+        if(Objects.equals(gameData.whiteUsername(), username)){
+            updatedGameData = new GameData(gameID, null, gameData.blackUsername(), gameData.gameName(), gameData.game());
+        }
+        else if(Objects.equals(gameData.blackUsername(), username)){
+            updatedGameData = new GameData(gameID, gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
+        }
+        else{
+            updatedGameData = gameData;
+        }
+        gameDAO.updateGame(gameID, updatedGameData);
+        String leaveMessage = String.format("%s left the game", username);
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, leaveMessage);
+        connections.broadcast(ctx.session, notification);
     };
     private void resign() throws IOException {
 //        Server marks game as over. No new moves can be made. Game is updates in the database

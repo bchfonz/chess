@@ -95,5 +95,20 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void leave(UserGameCommand.CommandType commandType, String authToken, int gameID) throws ResponseException {
+        //Create websocket message to send to the websocket server
+        try {
+            UserGameCommand command = new UserGameCommand(commandType, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+        }
+    }
+
+//    public void leave(UserGameCommand userGameCommand) throws IOException {
+//        this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+//
+//    }
+
 }
 

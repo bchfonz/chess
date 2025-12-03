@@ -54,7 +54,7 @@ public class GameplayUI {
                 case "leave" -> {
                     System.out.println("Leaving game...");
                     leave = true;
-
+                    wsf.leave(UserGameCommand.CommandType.LEAVE, authToken, gameID);
                 }
                 case "move" -> {
                     if(!validNumArgs(3, inputs.length)){
