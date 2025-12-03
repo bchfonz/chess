@@ -22,7 +22,6 @@ public class ExtraClient {
     //    private static ServerFacade serverFacadeObj = new ServerFacade();
     public static void main(String[] args) throws ResponseException {
         ExtraClient.init();
-//        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         for (var i = 0; i < args.length; i++) {
             System.out.printf("%d. %s%n", i+1, args[i]);
         }

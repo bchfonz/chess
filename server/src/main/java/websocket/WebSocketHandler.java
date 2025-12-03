@@ -115,7 +115,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
                 gameDAO.updateGame(gameID, updatedGameData);
                 connections.loadGame(game);
-                String message = "Move made: " + move;
+                char startCol = columnNumConverter(move.getStartPosition().getColumn());
+                char endCol = columnNumConverter(move.getEndPosition().getColumn());
+                String message = "Move made: " + startCol + move.getStartPosition().getRow() + " to " + endCol + move.getEndPosition().getRow();
                 NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(ctx.session, notification);
                 if (game.isInCheckmate(game.getTeamTurn())) {
@@ -134,8 +136,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     connections.broadcast(null, stalemateNotification);
                 }
             } catch (InvalidMoveException e) {
-                System.out.println("Invalid move exception message: " + e.getMessage());
-                ctx.send(gson.toJson(e.getMessage()));
+//                System.out.println("Invalid move exception message: " + e.getMessage());
+                String errorMsg = "Invalid move: " + e.getMessage();
+                ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMsg);
+                ctx.send(gson.toJson(errorMessage));
             }
         }
 //        Validate move
@@ -154,6 +158,35 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 //        Notification is sent to all clients
     }
 
+    private char columnNumConverter(int col){
+        if(col == 1) {
+            return 'a';
+        }
+        else if(col == 2) {
+            return 'b';
+        }
+        else if(col == 3) {
+            return 'c';
+        }
+        else if(col == 4) {
+            return 'd';
+        }
+        else if(col == 5) {
+            return 'e';
+        }
+        else if(col == 6) {
+            return 'f';
+        }
+        else if(col == 7) {
+            return 'g';
+        }
+        else if(col == 8){
+            return 'h';
+        }
+        else{
+            return 0;
+        }
+    }
 
 //    private void leave(String visitorName, Session session) throws IOException {
 //        var message = String.format("%s left the shop", visitorName);

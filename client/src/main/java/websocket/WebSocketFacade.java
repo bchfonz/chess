@@ -11,6 +11,7 @@ import ui.PrintBoard;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
@@ -26,7 +27,6 @@ public class WebSocketFacade extends Endpoint {
     private final Gson gson;
     PrintBoard boardPrinter = new PrintBoard();
     boolean whiteTeam = true;
-//    NotificationHandler notificationHandler;
 
     public WebSocketFacade(String url) throws ResponseException {
         this.gson = new Gson();
@@ -34,7 +34,6 @@ public class WebSocketFacade extends Endpoint {
 //          Establish WebSocket connection
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-//            this.notificationHandler = notificationHandler;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -43,11 +42,8 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-//                    System.out.println("This is the message that was sent to my facade: " + message);
                     if(message.contains("NOTIFICATION")){
-//                        System.out.println("In notification handler");
                         NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
-//                        System.out.println(notificationMessage);
                         System.out.println(notificationMessage.getNotificationMessage());
                     }
                     if(message.contains("LOAD_GAME")){
@@ -61,8 +57,10 @@ public class WebSocketFacade extends Endpoint {
                         }
 
                     }
-//                    Notification notification = new Gson().fromJson(message, Notification.class);
-//                    notificationHandler.notify(notification);
+                    if(message.contains("ERROR")){
+                        ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+                        System.out.println("Error: " + errorMessage.getErrorMessage());
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
