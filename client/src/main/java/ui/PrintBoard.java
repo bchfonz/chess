@@ -282,9 +282,6 @@ public class PrintBoard {
                     backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
                 }
 
-//                String backgroundColor = isDarkSquare
-//                        ? EscapeSequences.SET_BG_COLOR_DARK_GREY
-//                        : EscapeSequences.SET_BG_COLOR_BLUE;
                 boolean isWhitePiece = false;
                 String pieceString = " ";
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));

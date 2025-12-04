@@ -76,7 +76,8 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void connect(UserGameCommand.CommandType commandType, String authToken, int gameID, String team, boolean isPlayer) throws ResponseException {
+    public void connect(UserGameCommand.CommandType commandType, String authToken,
+                        int gameID, String team, boolean isPlayer) throws ResponseException {
         try {
             ConnectCommand command = new ConnectCommand(commandType, authToken, gameID, isPlayer, team);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
@@ -110,18 +111,13 @@ public class WebSocketFacade extends Endpoint {
 
     public void getLegalMoves(ChessPosition position, String team) throws ResponseException {
         //Create websocket message to send to the websocket server
-        if(Objects.equals(team, "BLACK"))
+        if(Objects.equals(team, "BLACK")) {
             boardPrinter.legalBlack(globalGame, position);
+        }
         else {
             boardPrinter.legalWhite(globalGame, position);
         }
 
     }
-
-//    public void leave(UserGameCommand userGameCommand) throws IOException {
-//        this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
-//
-//    }
-
 }
 

@@ -71,7 +71,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connect(username, ctx.session, connectCommand.getGameID(), ctx, connectCommand.isPlayer(), connectCommand.getTeam());
             }
             else {
-//            ServerMessage serverMessage = gson.fromJson(ctx.message(), ServerMessage.class);
                 UserGameCommand userGameCommand = gson.fromJson(ctx.message(), UserGameCommand.class);
                 String username = authDAO.getAuth(userGameCommand.getAuthToken()).username();
                 switch (userGameCommand.getCommandType()) {
@@ -79,9 +78,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     case RESIGN -> resign(userGameCommand.getGameID(), username, ctx);
                 }
             }
-//            switch (serverMessage.getServerMessageType()){
-//                case LOAD_GAME -> connect(serverMessage.getAuthToken(), ctx.session);
-//            }
         } catch (IOException ex) {
             ex.printStackTrace();
         } catch (DataAccessException e) {

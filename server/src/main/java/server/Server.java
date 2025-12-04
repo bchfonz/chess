@@ -37,35 +37,6 @@ public class Server {
             ws.onMessage(webSocetkHandler);
             ws.onClose(webSocetkHandler);
 
-            // When a client connects
-//            ws.onConnect(ctx -> {
-//                ctx.enableAutomaticPings();
-//                System.out.println("New client connected: ");
-//                ctx.send( gson.toJson("Welcome! Your session id is cool") );
-//            });
-//
-//            // When a message is received
-//            ws.onMessage(ctx -> {
-//                String msg = ctx.message();
-//                // Ignore heartbeat messages
-//                System.out.println("This is the message:" + msg);
-//                ctx.send(gson.toJson("Server echo: " + msg));
-//
-//
-//                // Echo back to the sender
-//
-//
-//                // Broadcast to all other clients
-//                System.out.println("Your session ID is: " + ctx.sessionId());
-//
-//
-//            });
-//
-//            // When a client disconnects
-//            ws.onClose(ctx -> {
-//                System.out.println("Client disconnected: ");
-//            });
-//
 //            // On error
             ws.onError(ctx -> {
                 System.err.println(
