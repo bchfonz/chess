@@ -12,14 +12,7 @@ public class PrintBoard {
         System.out.print(EscapeSequences.ERASE_SCREEN);
 
         // --- Print top border with file labels (a-h)
-        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        System.out.print("   "); // Left margin before A
-        for (char c = 'h'; c >= 'a'; c--) {
-            System.out.print(" " + c + " ");
-        }
-        System.out.print("   ");
-        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+        printBlackBorders();
 
         // --- Print board rows ---
         for (int row = 1; row <= 8; row++) {
@@ -64,14 +57,7 @@ public class PrintBoard {
         }
 
         // --- Bottom border with file labels again ---
-        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        System.out.print("   "); // Left margin
-        for (char c = 'h'; c >= 'a'; c--) {
-            System.out.print(" " + c + " ");
-        }
-        System.out.print("   ");
-        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+        printBlackBorders();
     }
 
     public void boardWhite(ChessGame game){
@@ -79,14 +65,7 @@ public class PrintBoard {
         System.out.print(EscapeSequences.ERASE_SCREEN);
 
 // --- Print top border with file labels (h–a for Black’s view)
-        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        System.out.print("   "); // Left margin before H
-        for (char c = 'a'; c <= 'h'; c++) {
-            System.out.print(" " + c + " ");
-        }
-        System.out.print("   ");
-        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+        printBorders();
 
 // --- Print board rows (from 1 at top to 8 at bottom)
         for (int row = 8; row >= 1; row--) {
@@ -129,14 +108,7 @@ public class PrintBoard {
         }
 
 // --- Bottom border with file labels again (h–a)
-        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        System.out.print("   "); // Left margin
-        for (char c = 'a'; c <= 'h'; c++) {
-            System.out.print(" " + c + " ");
-        }
-        System.out.print("   ");
-        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+        printBorders();
 
     }
 
@@ -150,14 +122,7 @@ public class PrintBoard {
         System.out.print(EscapeSequences.ERASE_SCREEN);
 
 // --- Print top border with file labels (h–a for Black’s view)
-        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        System.out.print("   "); // Left margin before H
-        for (char c = 'a'; c <= 'h'; c++) {
-            System.out.print(" " + c + " ");
-        }
-        System.out.print("   ");
-        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+        printBorders();
 
 // --- Print board rows (from 1 at top to 8 at bottom)
         for (int row = 8; row >= 1; row--) {
@@ -169,46 +134,7 @@ public class PrintBoard {
 
             // Print board squares
             for (int col = 1; col <= 8; col++) {
-                boolean isDarkSquare = (row + col) % 2 == 0;
-                ChessPosition curPos = new ChessPosition(row, col);
-                String backgroundColor;
-                if(isDarkSquare){
-                    if(legalEndPos.containsKey(curPos)){
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
-                    }
-                    else{
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-                    }
-                }
-                else{
-                    if(legalEndPos.containsKey(curPos)){
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
-                    }
-                    else{
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_BLUE;
-                    }
-                }
-                if(Objects.equals(curPos, piecePos)){
-                    backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
-                }
-
-//                String backgroundColor = isDarkSquare
-//                        ? EscapeSequences.SET_BG_COLOR_DARK_GREY
-//                        : EscapeSequences.SET_BG_COLOR_BLUE;
-                boolean isWhitePiece = false;
-                String pieceString = " ";
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if (piece != null) {
-                    isWhitePiece = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
-                    pieceString = chessPieceString(piece);
-                }
-
-                String textColor = isWhitePiece
-                        ? EscapeSequences.SET_TEXT_COLOR_WHITE
-                        : EscapeSequences.SET_TEXT_COLOR_RED;
-
-                System.out.print(backgroundColor + textColor + " " + pieceString + " " +
-                        EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+                printBoardSquares(piecePos, legalEndPos, board, row, col);
             }
 
             // Right border with rank label
@@ -220,6 +146,10 @@ public class PrintBoard {
         }
 
 // --- Bottom border with file labels again (h–a)
+        printBorders();
+    }
+
+    private void printBorders() {
         System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         System.out.print("   "); // Left margin
@@ -228,6 +158,46 @@ public class PrintBoard {
         }
         System.out.print("   ");
         System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+    }
+
+    private void printBoardSquares(ChessPosition piecePos, HashMap<ChessPosition, ChessPosition> legalEndPos, ChessBoard board, int row, int col) {
+        boolean isDarkSquare = (row + col) % 2 == 0;
+        ChessPosition curPos = new ChessPosition(row, col);
+        String backgroundColor;
+        if(isDarkSquare){
+            if(legalEndPos.containsKey(curPos)){
+                backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+            }
+            else{
+                backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+            }
+        }
+        else{
+            if(legalEndPos.containsKey(curPos)){
+                backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
+            }
+            else{
+                backgroundColor = EscapeSequences.SET_BG_COLOR_BLUE;
+            }
+        }
+        if(Objects.equals(curPos, piecePos)){
+            backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+        }
+
+        boolean isWhitePiece = false;
+        String pieceString = " ";
+        ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+        if (piece != null) {
+            isWhitePiece = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
+            pieceString = chessPieceString(piece);
+        }
+
+        String textColor = isWhitePiece
+                ? EscapeSequences.SET_TEXT_COLOR_WHITE
+                : EscapeSequences.SET_TEXT_COLOR_RED;
+
+        System.out.print(backgroundColor + textColor + " " + pieceString + " " +
+                EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
     }
 
     public void legalBlack(ChessGame game, ChessPosition piecePos){
@@ -240,14 +210,7 @@ public class PrintBoard {
         System.out.print(EscapeSequences.ERASE_SCREEN);
 
 // --- Print top border with file labels (h–a for Black’s view)
-        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        System.out.print("   "); // Left margin before H
-        for (char c = 'h'; c >= 'a'; c--) {
-            System.out.print(" " + c + " ");
-        }
-        System.out.print("   ");
-        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+        printBlackBorders();
 
 // --- Print board rows (from 1 at top to 8 at bottom)
         for (int row = 1; row <= 8; row++) {
@@ -259,43 +222,7 @@ public class PrintBoard {
 
             // Print board squares
             for (int col = 8; col >= 1; col--) {
-                boolean isDarkSquare = (row + col) % 2 == 0;
-                ChessPosition curPos = new ChessPosition(row, col);
-                String backgroundColor;
-                if(isDarkSquare){
-                    if(legalEndPos.containsKey(curPos)){
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
-                    }
-                    else{
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-                    }
-                }
-                else{
-                    if(legalEndPos.containsKey(curPos)){
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
-                    }
-                    else{
-                        backgroundColor = EscapeSequences.SET_BG_COLOR_BLUE;
-                    }
-                }
-                if(Objects.equals(curPos, piecePos)){
-                    backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
-                }
-
-                boolean isWhitePiece = false;
-                String pieceString = " ";
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if (piece != null) {
-                    isWhitePiece = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
-                    pieceString = chessPieceString(piece);
-                }
-
-                String textColor = isWhitePiece
-                        ? EscapeSequences.SET_TEXT_COLOR_WHITE
-                        : EscapeSequences.SET_TEXT_COLOR_RED;
-
-                System.out.print(backgroundColor + textColor + " " + pieceString + " " +
-                        EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+                printBoardSquares(piecePos, legalEndPos, board, row, col);
             }
 
             // Right border with rank label
@@ -307,9 +234,13 @@ public class PrintBoard {
         }
 
 // --- Bottom border with file labels again (h–a)
+        printBlackBorders();
+    }
+
+    private void printBlackBorders() {
         System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        System.out.print("   "); // Left margin
+        System.out.print("   "); // Left margin before H
         for (char c = 'h'; c >= 'a'; c--) {
             System.out.print(" " + c + " ");
         }
