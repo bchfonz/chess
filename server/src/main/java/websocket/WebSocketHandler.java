@@ -55,13 +55,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 String username = authDAO.getAuth(connectCommand.getAuthToken()).username();
                 connect(username, ctx.session, connectCommand.getGameID(), ctx, connectCommand.isPlayer(), connectCommand.getTeam());
             }
+            else if(ctx.message().contains("LEGAL_MOVE")){
+
+            }
             else {
 //            ServerMessage serverMessage = gson.fromJson(ctx.message(), ServerMessage.class);
                 UserGameCommand userGameCommand = gson.fromJson(ctx.message(), UserGameCommand.class);
                 String username = authDAO.getAuth(userGameCommand.getAuthToken()).username();
                 switch (userGameCommand.getCommandType()) {
                     case LEAVE -> leave(userGameCommand.getGameID(), username, ctx);
-                    case RESIGN -> resign();
+                    case RESIGN -> resign(userGameCommand.getGameID(), username, ctx);
                 }
             }
 //            switch (serverMessage.getServerMessageType()){
@@ -80,40 +83,54 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void connect(String playerName, Session session, int gameID, WsMessageContext ctx, boolean isPlayer, String team) throws IOException {
-        connections.add(session);
-        NotificationMessage notification;
+        boolean connected = connections.userConnected(session);
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
-        System.out.println("isPlayer = " + isPlayer);
-        String joinedMessage = String.format("%s joined the game", playerName);
-        String observerMessage = String.format("%s is observing the game", playerName);
-        //Checks for either observer or player
-        if(isPlayer){
-            notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, joinedMessage);
-            gameServiceObj.joinGame(playerName, team, gameID);
-        } else {
-            notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, observerMessage);
+        if(connected){
+            String redrawBoard = "Redrawing board:";
+            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, redrawBoard);
+            ctx.send(notification.toString());
+            LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            ctx.send(loadGameMessage.toString());
         }
+        else {
+            connections.add(session);
+            NotificationMessage notification;
+            String joinedMessage = String.format("%s joined the game", playerName);
+            String observerMessage = String.format("%s is observing the game", playerName);
+            //Checks for either observer or player
+            if (isPlayer) {
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, joinedMessage);
+                gameServiceObj.joinGame(playerName, team, gameID);
+            } else {
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, observerMessage);
+            }
 
-        LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-        ctx.send(loadGameMessage.toString());
-        connections.broadcast(session, notification);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            ctx.send(loadGameMessage.toString());
+            connections.broadcast(session, notification);
+        }
     }
 
     private void makeMove(Integer gameID, ChessMove move, String username, WsMessageContext ctx) throws IOException {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
+        if(game.isGameOver()){
+            String gameOver = "Game is already over. No new moves can be made.";
+            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, gameOver);
+            ctx.send(gson.toJson(notification));
+            return;
+        }
         boolean isWhiteTurn = Objects.equals(game.getTeamTurn(), ChessGame.TeamColor.WHITE);
         boolean isPlayerWhite = Objects.equals(username, gameData.whiteUsername());
         if(isWhiteTurn != isPlayerWhite){
             String invalidTurn = "Not your turn!";
-            ctx.send(gson.toJson(invalidTurn));
+            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, invalidTurn);
+            ctx.send(gson.toJson(notification));
         }
         else {
             try {
                 game.makeMove(move);
-                GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
-                gameDAO.updateGame(gameID, updatedGameData);
                 connections.loadGame(game);
                 char startCol = columnNumConverter(move.getStartPosition().getColumn());
                 char endCol = columnNumConverter(move.getEndPosition().getColumn());
@@ -121,20 +138,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(ctx.session, notification);
                 if (game.isInCheckmate(game.getTeamTurn())) {
-                    String checkmate = game.getTeamTurn() + " is in checkmate!";
+                    String checkmate = "Game over. " + game.getTeamTurn() + " is in checkmate!";
                     NotificationMessage checkmateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkmate);
                     connections.broadcast(null, checkmateNotification);
+                    game.setGameOver(true);
                 }
-                if (game.isInCheck(game.getTeamTurn())) {
+                else if (game.isInCheck(game.getTeamTurn())) {
                     String check = game.getTeamTurn() + " is in check!";
                     NotificationMessage checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, check);
                     connections.broadcast(null, checkNotification);
                 }
-                if (game.isInStalemate(game.getTeamTurn())) {
-                    String stalemate = "Game ended in stalemate!";
+                else if (game.isInStalemate(game.getTeamTurn())) {
+                    String stalemate = "Game over. Game ended in stalemate!";
                     NotificationMessage stalemateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stalemate);
                     connections.broadcast(null, stalemateNotification);
+                    game.setGameOver(true);
                 }
+                GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+                gameDAO.updateGame(gameID, updatedGameData);
             } catch (InvalidMoveException e) {
                 String errorMsg = "Invalid move: " + e.getMessage();
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMsg);
@@ -164,8 +185,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String leaveMessage = String.format("%s left the game", username);
         NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, leaveMessage);
         connections.broadcast(ctx.session, notification);
+        connections.remove(ctx.session);
     };
-    private void resign() throws IOException {
+    private void resign(Integer gameID, String username, WsMessageContext ctx) throws IOException {
+        GameData gameData = gameDAO.getGame(gameID);
+        ChessGame game = gameData.game();
+        game.setGameOver(true);
+        GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+        gameDAO.updateGame(gameID, updatedGameData);
+        String resignMessage = username + " has resigned from the game. The game is over.";
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, resignMessage);
+        connections.broadcast(null, notification);
 //        Server marks game as over. No new moves can be made. Game is updates in the database
 //        Notification is sent to all clients
     }
@@ -199,11 +229,4 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return 0;
         }
     }
-
-//    private void leave(String visitorName, Session session) throws IOException {
-//        var message = String.format("%s left the shop", visitorName);
-//        var notification = new Notification(Notification.Type.DEPARTURE, message);
-//        connections.broadcast(session, notification);
-//        connections.remove(session);
-//    }
 }

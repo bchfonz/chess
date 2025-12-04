@@ -17,26 +17,22 @@ import java.util.Scanner;
 public class GameplayUI {
     private final WebSocketFacade wsf;
     String url;
-    boolean isPlayer = true;
     public GameplayUI(String url) throws ResponseException {
         this.url = url;
         this.wsf = new WebSocketFacade(url);
     }
 
     public void observeGame(String authToken, int gameID) throws ResponseException {
-        System.out.println("In observeGame");
-        isPlayer = false;
         wsf.connect(UserGameCommand.CommandType.CONNECT, authToken, gameID, null, false);
-        gameplay(authToken, gameID);
+        gameplay(authToken, gameID, false, null);
     }
 //
     public void joinGame(String authToken, int gameID, String team) throws ResponseException {
-        isPlayer = true;
         wsf.connect(ConnectCommand.CommandType.CONNECT, authToken, gameID, team, true);
-        gameplay(authToken, gameID);
+        gameplay(authToken, gameID, true, team);
     }
 
-    public void gameplay(String authToken, int gameID) throws ResponseException {
+    public void gameplay(String authToken, int gameID, boolean isPlayer, String team) throws ResponseException {
         boolean leave = false;
 
         while(!leave){
@@ -46,10 +42,21 @@ public class GameplayUI {
             var input = inputs[0];
             switch (input) {
                 case "help" -> {
-                    commandList();
+                    if(isPlayer){
+                        playerCommandList();
+                    }
+                    else{
+                        observerCommandList();
+                    }
                 }
                 case "redraw" -> {
+                    if(isPlayer){
+                        wsf.connect(ConnectCommand.CommandType.CONNECT, authToken, gameID, team, true);
+                    }
+                    else{
+                        wsf.connect(UserGameCommand.CommandType.CONNECT, authToken, gameID, null, false);
 
+                    }
                 }
                 case "leave" -> {
                     System.out.println("Leaving game...");
@@ -57,6 +64,11 @@ public class GameplayUI {
                     wsf.leave(UserGameCommand.CommandType.LEAVE, authToken, gameID);
                 }
                 case "move" -> {
+                    if(!isPlayer){
+                    System.out.println("Invalid command for observers");
+                    observerCommandList();
+                    continue;
+                    }
                     if(!validNumArgs(3, inputs.length)){
                         System.out.println("Invalid number of arguments");
                         System.out.println("Remember to put a space between <START> and <END> positions");
@@ -80,23 +92,53 @@ public class GameplayUI {
 
                 }
                 case "resign" -> {
-
+                    if(!isPlayer){
+                        System.out.println("Invalid command for observers");
+                        observerCommandList();
+                        continue;
+                    }
+                    System.out.println("Are you sure you want to resign? (yes/no)");
+                    String response = scanner.nextLine();
+                    if(Objects.equals(response, "yes")) {
+                        wsf.leave(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+                    }
                 }
                 case "legal" -> {
+                    String piecePos = inputs[1];
+                    char piecePosLetter = piecePos.charAt(0);
+                    int piecePosCol = letterToNumber(piecePosLetter);
+                    int piecePosRow = Character.getNumericValue(piecePos.charAt(1));
+                    if(piecePosRow > 8 || piecePosRow < 1 || piecePosCol > 8 || piecePosCol < 1) {
+                        System.out.println("Invalid position. Rows must be 1-8 and columns must be a-h");
+                        continue;
+                    }
+                    ChessPosition position = new ChessPosition(piecePosRow, piecePosCol);
+                    wsf.getLegalMoves(position, team);
                 }
 
                 default ->{
                     System.out.println("Unknown command. Commands:");
-                    commandList();
+                    if(isPlayer){
+                        playerCommandList();
+                    }
+                    else{
+                        observerCommandList();
+                    }
                 }
             }
         }
     }
-    private void commandList() {
+    private void playerCommandList() {
         System.out.println("redraw - the board");
         System.out.println("leave - the game");
         System.out.println("move <START> <END> - make a move");
         System.out.println("resign - from the game");
+        System.out.println("legal <PIECE POSITION> - highlights legal moves for a piece");
+        System.out.println("help - with possible commands");
+    }
+    private void observerCommandList() {
+        System.out.println("redraw - the board");
+        System.out.println("leave - the game");
         System.out.println("legal <PIECE POSITION> - highlights legal moves for a piece");
         System.out.println("help - with possible commands");
     }

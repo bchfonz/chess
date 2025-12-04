@@ -2,6 +2,7 @@ package websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import exception.ResponseException;
 
@@ -27,6 +28,7 @@ public class WebSocketFacade extends Endpoint {
     private final Gson gson;
     PrintBoard boardPrinter = new PrintBoard();
     boolean whiteTeam = true;
+    ChessGame globalGame;
 
     public WebSocketFacade(String url) throws ResponseException {
         this.gson = new Gson();
@@ -50,6 +52,7 @@ public class WebSocketFacade extends Endpoint {
                         //Handle load game message
                         LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
                         ChessGame game = loadGameMessage.getGame();
+                        globalGame = game;
                         if(whiteTeam){
                             boardPrinter.boardWhite(game);
                         } else {
@@ -103,6 +106,16 @@ public class WebSocketFacade extends Endpoint {
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
+    }
+
+    public void getLegalMoves(ChessPosition position, String team) throws ResponseException {
+        //Create websocket message to send to the websocket server
+        if(Objects.equals(team, "BLACK"))
+            boardPrinter.legalBlack(globalGame, position);
+        else {
+            boardPrinter.legalWhite(globalGame, position);
+        }
+
     }
 
 //    public void leave(UserGameCommand userGameCommand) throws IOException {

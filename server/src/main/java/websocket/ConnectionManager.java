@@ -21,6 +21,10 @@ public class ConnectionManager {
         connections.remove(session);
     }
 
+    public boolean userConnected(Session session) {
+        return connections.containsKey(session);
+    }
+
     public void broadcast(Session excludeSession, NotificationMessage notification) throws IOException {
 //        String msg = notification.getNotificationMessage();
         for (Session c : connections.values()) {

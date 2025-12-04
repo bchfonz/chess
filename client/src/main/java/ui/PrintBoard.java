@@ -1,9 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class PrintBoard {
     public void boardBlack(ChessGame game){
@@ -137,6 +138,186 @@ public class PrintBoard {
         System.out.print("   ");
         System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
 
+    }
+
+    public void legalWhite(ChessGame game, ChessPosition piecePos){
+        HashMap<ChessPosition, ChessPosition> legalEndPos = new HashMap<>();
+        Collection<ChessMove> legalMoves = game.validMoves(piecePos);
+        for(ChessMove move : legalMoves){
+            legalEndPos.put(move.getEndPosition(), move.getEndPosition());
+        }
+        ChessBoard board = game.getBoard();
+        System.out.print(EscapeSequences.ERASE_SCREEN);
+
+// --- Print top border with file labels (h–a for Black’s view)
+        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        System.out.print("   "); // Left margin before H
+        for (char c = 'a'; c <= 'h'; c++) {
+            System.out.print(" " + c + " ");
+        }
+        System.out.print("   ");
+        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+
+// --- Print board rows (from 1 at top to 8 at bottom)
+        for (int row = 8; row >= 1; row--) {
+
+            // Left border with rank label
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            System.out.print(" " + row + " " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+
+            // Print board squares
+            for (int col = 1; col <= 8; col++) {
+                boolean isDarkSquare = (row + col) % 2 == 0;
+                ChessPosition curPos = new ChessPosition(row, col);
+                String backgroundColor;
+                if(isDarkSquare){
+                    if(legalEndPos.containsKey(curPos)){
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+                    }
+                    else{
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+                    }
+                }
+                else{
+                    if(legalEndPos.containsKey(curPos)){
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
+                    }
+                    else{
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_BLUE;
+                    }
+                }
+                if(Objects.equals(curPos, piecePos)){
+                    backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+                }
+
+//                String backgroundColor = isDarkSquare
+//                        ? EscapeSequences.SET_BG_COLOR_DARK_GREY
+//                        : EscapeSequences.SET_BG_COLOR_BLUE;
+                boolean isWhitePiece = false;
+                String pieceString = " ";
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                if (piece != null) {
+                    isWhitePiece = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
+                    pieceString = chessPieceString(piece);
+                }
+
+                String textColor = isWhitePiece
+                        ? EscapeSequences.SET_TEXT_COLOR_WHITE
+                        : EscapeSequences.SET_TEXT_COLOR_RED;
+
+                System.out.print(backgroundColor + textColor + " " + pieceString + " " +
+                        EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+            }
+
+            // Right border with rank label
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            System.out.print(" " + row + " " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+
+            System.out.println();
+        }
+
+// --- Bottom border with file labels again (h–a)
+        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        System.out.print("   "); // Left margin
+        for (char c = 'a'; c <= 'h'; c++) {
+            System.out.print(" " + c + " ");
+        }
+        System.out.print("   ");
+        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+    }
+
+    public void legalBlack(ChessGame game, ChessPosition piecePos){
+        HashMap<ChessPosition, ChessPosition> legalEndPos = new HashMap<>();
+        Collection<ChessMove> legalMoves = game.validMoves(piecePos);
+        for(ChessMove move : legalMoves){
+            legalEndPos.put(move.getEndPosition(), move.getEndPosition());
+        }
+        ChessBoard board = game.getBoard();
+        System.out.print(EscapeSequences.ERASE_SCREEN);
+
+// --- Print top border with file labels (h–a for Black’s view)
+        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        System.out.print("   "); // Left margin before H
+        for (char c = 'h'; c >= 'a'; c--) {
+            System.out.print(" " + c + " ");
+        }
+        System.out.print("   ");
+        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+
+// --- Print board rows (from 1 at top to 8 at bottom)
+        for (int row = 1; row <= 8; row++) {
+
+            // Left border with rank label
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            System.out.print(" " + row + " " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+
+            // Print board squares
+            for (int col = 8; col >= 1; col--) {
+                boolean isDarkSquare = (row + col) % 2 == 0;
+                ChessPosition curPos = new ChessPosition(row, col);
+                String backgroundColor;
+                if(isDarkSquare){
+                    if(legalEndPos.containsKey(curPos)){
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+                    }
+                    else{
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+                    }
+                }
+                else{
+                    if(legalEndPos.containsKey(curPos)){
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
+                    }
+                    else{
+                        backgroundColor = EscapeSequences.SET_BG_COLOR_BLUE;
+                    }
+                }
+                if(Objects.equals(curPos, piecePos)){
+                    backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+                }
+
+//                String backgroundColor = isDarkSquare
+//                        ? EscapeSequences.SET_BG_COLOR_DARK_GREY
+//                        : EscapeSequences.SET_BG_COLOR_BLUE;
+                boolean isWhitePiece = false;
+                String pieceString = " ";
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                if (piece != null) {
+                    isWhitePiece = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
+                    pieceString = chessPieceString(piece);
+                }
+
+                String textColor = isWhitePiece
+                        ? EscapeSequences.SET_TEXT_COLOR_WHITE
+                        : EscapeSequences.SET_TEXT_COLOR_RED;
+
+                System.out.print(backgroundColor + textColor + " " + pieceString + " " +
+                        EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+            }
+
+            // Right border with rank label
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            System.out.print(" " + row + " " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+
+            System.out.println();
+        }
+
+// --- Bottom border with file labels again (h–a)
+        System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        System.out.print("   "); // Left margin
+        for (char c = 'h'; c >= 'a'; c--) {
+            System.out.print(" " + c + " ");
+        }
+        System.out.print("   ");
+        System.out.println(EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
     }
 
     private String chessPieceString (ChessPiece piece){
