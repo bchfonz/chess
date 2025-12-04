@@ -22,11 +22,13 @@ import websocket.commands.*;
 import websocket.messages.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final Gson gson = new Gson();
-    private final ConnectionManager connections = new ConnectionManager();
+    public final HashMap<Integer, ConnectionManager> gameConnections = new HashMap<>();
+//    private final ConnectionManager connections = new ConnectionManager();
     private final SqlGameDAO gameDAO = new SqlGameDAO();
     private final SqlAuthDAO authDAO = new SqlAuthDAO();
     private final GameService gameServiceObj = new GameService();
@@ -46,17 +48,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 MakeMoveCommand makeMoveCommand = gson.fromJson(ctx.message(), MakeMoveCommand.class);
                 ChessMove move = makeMoveCommand.getMove();
                 int gameID = makeMoveCommand.getGameID();
+                if (authDAO.getAuth(makeMoveCommand.getAuthToken()) == null) {
+                    ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid auth token");
+                    ctx.send(new Gson().toJson(error));
+                    return;
+                }
                 String authToken = makeMoveCommand.getAuthToken();
                 String username = authDAO.getAuth(authToken).username();
                 makeMove(gameID, move, username, ctx);
             }
             else if(ctx.message().contains("CONNECT")){
                 ConnectCommand connectCommand = gson.fromJson(ctx.message(), ConnectCommand.class);
+                if (authDAO.getAuth(connectCommand.getAuthToken()) == null) {
+                    ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid auth token");
+                    ctx.send(new Gson().toJson(error));
+                    return;
+                }
+                if(!gameConnections.containsKey(connectCommand.getGameID())) {
+                    gameConnections.put(connectCommand.getGameID(), new ConnectionManager());
+                }
                 String username = authDAO.getAuth(connectCommand.getAuthToken()).username();
                 connect(username, ctx.session, connectCommand.getGameID(), ctx, connectCommand.isPlayer(), connectCommand.getTeam());
-            }
-            else if(ctx.message().contains("LEGAL_MOVE")){
-
             }
             else {
 //            ServerMessage serverMessage = gson.fromJson(ctx.message(), ServerMessage.class);
@@ -83,12 +95,25 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void connect(String playerName, Session session, int gameID, WsMessageContext ctx, boolean isPlayer, String team) throws IOException {
+        ConnectionManager connections = gameConnections.get(gameID);
         boolean connected = connections.userConnected(session);
-        GameData gameData = gameDAO.getGame(gameID);
-        ChessGame game = gameData.game();
+        GameData gameData;
+        ChessGame game = null;
+        if(gameDAO.getGame(gameID) != null){
+            gameData = gameDAO.getGame(gameID);
+            if(gameData.game() != null){
+                game = gameData.game();
+            }
+        }
+        if(game == null){
+            String message = "Game data not found.";
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            ctx.send(errorMessage.toString());
+            return;
+        }
         if(connected){
-            String redrawBoard = "Redrawing board:";
-            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, redrawBoard);
+            String message = "Redrawing board:";
+            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             ctx.send(notification.toString());
             LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
             ctx.send(loadGameMessage.toString());
@@ -96,14 +121,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else {
             connections.add(session);
             NotificationMessage notification;
-            String joinedMessage = String.format("%s joined the game", playerName);
-            String observerMessage = String.format("%s is observing the game", playerName);
             //Checks for either observer or player
             if (isPlayer) {
-                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, joinedMessage);
+                String message = String.format("%s joined the game", playerName);
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 gameServiceObj.joinGame(playerName, team, gameID);
             } else {
-                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, observerMessage);
+                String message = String.format("%s is observing the game", playerName);
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             }
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
@@ -116,19 +141,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
         if(game.isGameOver()){
-            String gameOver = "Game is already over. No new moves can be made.";
-            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, gameOver);
-            ctx.send(gson.toJson(notification));
+            String message = "Game is already over. No new moves can be made.";
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            ctx.send(gson.toJson(error));
             return;
         }
         boolean isWhiteTurn = Objects.equals(game.getTeamTurn(), ChessGame.TeamColor.WHITE);
         boolean isPlayerWhite = Objects.equals(username, gameData.whiteUsername());
         if(isWhiteTurn != isPlayerWhite){
-            String invalidTurn = "Not your turn!";
-            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, invalidTurn);
-            ctx.send(gson.toJson(notification));
+            String message = "Not your turn!";
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            ctx.send(gson.toJson(error));
         }
         else {
+            ConnectionManager connections = gameConnections.get(gameID);
             try {
                 game.makeMove(move);
                 connections.loadGame(game);
@@ -138,19 +164,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(ctx.session, notification);
                 if (game.isInCheckmate(game.getTeamTurn())) {
-                    String checkmate = "Game over. " + game.getTeamTurn() + " is in checkmate!";
-                    NotificationMessage checkmateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkmate);
+                    message = "Game over. " + game.getTeamTurn() + " is in checkmate!";
+                    NotificationMessage checkmateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                     connections.broadcast(null, checkmateNotification);
                     game.setGameOver(true);
                 }
                 else if (game.isInCheck(game.getTeamTurn())) {
-                    String check = game.getTeamTurn() + " is in check!";
-                    NotificationMessage checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, check);
+                    message = game.getTeamTurn() + " is in check!";
+                    NotificationMessage checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                     connections.broadcast(null, checkNotification);
                 }
                 else if (game.isInStalemate(game.getTeamTurn())) {
-                    String stalemate = "Game over. Game ended in stalemate!";
-                    NotificationMessage stalemateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stalemate);
+                    message = "Game over. Game ended in stalemate!";
+                    NotificationMessage stalemateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                     connections.broadcast(null, stalemateNotification);
                     game.setGameOver(true);
                 }
@@ -181,20 +207,35 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else{
             updatedGameData = gameData;
         }
+        ConnectionManager connections = gameConnections.get(gameID);
         gameDAO.updateGame(gameID, updatedGameData);
-        String leaveMessage = String.format("%s left the game", username);
-        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, leaveMessage);
+        String message = String.format("%s left the game", username);
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(ctx.session, notification);
         connections.remove(ctx.session);
     };
     private void resign(Integer gameID, String username, WsMessageContext ctx) throws IOException {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
+        boolean isObserver = !Objects.equals(gameData.whiteUsername(), username) && !Objects.equals(gameData.blackUsername(), username);
+        if(game.isGameOver()){
+            String message = "Game is already over. No new moves can be made.";
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            ctx.send(gson.toJson(error));
+            return;
+        }
+        if(isObserver){
+            String message = "Observers cannot resign from the game.";
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            ctx.send(gson.toJson(error));
+            return;
+        }
         game.setGameOver(true);
         GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
         gameDAO.updateGame(gameID, updatedGameData);
-        String resignMessage = username + " has resigned from the game. The game is over.";
-        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, resignMessage);
+        String message = username + " has resigned from the game. The game is over.";
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        ConnectionManager connections = gameConnections.get(gameID);
         connections.broadcast(null, notification);
 //        Server marks game as over. No new moves can be made. Game is updates in the database
 //        Notification is sent to all clients

@@ -3,14 +3,14 @@ package websocket.messages;
 import com.google.gson.Gson;
 
 public class NotificationMessage extends ServerMessage{
-    String notificationMessage;
-    public NotificationMessage(ServerMessageType type, String notificationMessage) {
+    String message;
+    public NotificationMessage(ServerMessageType type, String message) {
         super(type);
-        this.notificationMessage = notificationMessage;
+        this.message = message;
     }
 
     public String getNotificationMessage() {
-        return notificationMessage;
+        return message;
     }
 
     public String toString() {
