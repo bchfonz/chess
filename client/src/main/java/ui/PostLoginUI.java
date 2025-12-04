@@ -8,8 +8,10 @@ import server.JoinGameRequest;
 import server.ListGamesResult;
 import websocket.WebSocketFacade;
 
+import java.lang.runtime.ObjectMethods;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class PostLoginUI {
@@ -74,6 +76,11 @@ public class PostLoginUI {
                     int id = Integer.parseInt(inputs[1]);
                     if(gameMap.get(id) == null){
                         System.out.println("Invalid game ID");
+                        continue;
+                    }
+                    team = team.toUpperCase();
+                    if(!(Objects.equals(team, "WHITE") || Objects.equals(team, "BLACK"))){
+                        System.out.println("Invalid team. Must be BLACK or WHITE");
                         continue;
                     }
                     int gameID = gameMap.get(id);
