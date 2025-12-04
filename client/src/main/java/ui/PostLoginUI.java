@@ -78,7 +78,6 @@ public class PostLoginUI {
                         System.out.println("Invalid game ID");
                         continue;
                     }
-                    team = team.toUpperCase();
                     if(!(Objects.equals(team, "WHITE") || Objects.equals(team, "BLACK"))){
                         System.out.println("Invalid team. Must be BLACK or WHITE");
                         continue;

@@ -80,9 +80,15 @@ public class WebSocketFacade extends Endpoint {
                         int gameID, String team, boolean isPlayer) throws ResponseException {
         try {
             ConnectCommand command = new ConnectCommand(commandType, authToken, gameID, isPlayer, team);
+//            if (team != null) {
+//                team = team.toUpperCase();
+//            }
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
             if(team != null && isPlayer) {
                 whiteTeam = Objects.equals(team, "WHITE");
+            }
+            if(!isPlayer){
+                whiteTeam = true;
             }
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
